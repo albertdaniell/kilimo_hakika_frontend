@@ -37,7 +37,7 @@ export default function Login() {
         {/* Actions */}
         <div className="flex items-center justify-between text-sm">
           <a
-            href="#"
+            href="/auth/forgot-password"
             className="text-green-600 hover:underline font-medium"
           >
             Forgot password?
