@@ -1,29 +1,64 @@
+"use client"
+import { useState } from "react";
+import Link from "next/link";
+
 export default function TopNav() {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-b-slate-200 z-50">
       <div className="h-full px-6 flex items-center justify-between">
         {/* Logo */}
         <div className="text-xl font-bold text-green-600">
-          KilimoHakika
+          <Link href="/">KilimoHakika</Link>
         </div>
 
         {/* Nav Links */}
         <nav className="hidden md:flex items-center gap-6 text-sm text-gray-600">
-          <a href="#" className="hover:text-blue-600">Products</a>
-          <a href="#" className="hover:text-blue-600">Solutions</a>
-          <a href="#" className="hover:text-blue-600">Resources</a>
-          <a href="#" className="hover:text-blue-600">Plans & Pricing</a>
+          <Link href="/products" className="hover:text-green-600">Products</Link>
+          <Link href="/solutions" className="hover:text-green-600">Solutions</Link>
+          <Link href="/resources" className="hover:text-green-600">Resources</Link>
+          <Link href="/plans" className="hover:text-green-600">Plans & Pricing</Link>
         </nav>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-4">
-          <button className="text-sm font-medium text-blue-600">
+        <div className="flex items-center gap-4 relative">
+          <Link href="/schedule" className="text-sm font-medium text-green-600">
             Schedule
-          </button>
-          <button className="text-sm font-medium text-blue-600">
+          </Link>
+          <Link href="/join" className="text-sm font-medium text-green-600">
             Join
-          </button>
-          <div className="w-8 h-8 rounded-full bg-gray-300" />
+          </Link>
+
+          {/* Account Icon Dropdown */}
+          <div className="relative">
+            <button
+              onClick={toggleDropdown}
+              className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center"
+            >
+              {/* Placeholder for icon */}
+              <span className="text-sm font-bold text-white">A</span>
+            </button>
+
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-2 z-50">
+                <p className="px-4 py-2 text-sm text-gray-700 font-semibold">Daniel Albert</p>
+                <Link href="/profile" className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">
+                  My Track
+                </Link>
+                <Link href="/settings" className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">
+                 Upcoming Meetings
+                </Link>
+                
+                <hr className="my-1 border-gray-200" />
+                <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
