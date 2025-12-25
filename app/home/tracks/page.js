@@ -52,7 +52,14 @@ export default function TracksPage() {
   return (
     <div className="px-8 min-h-screen">
       <h1 className="text-3xl font-bold mb-6 text-gray-900">Available Tracks</h1>
-
+<div className="p-4 mb-6 bg-green-50 border-l-4 border-green-500 rounded-md text-green-700">
+  <h3 className="font-semibold text-lg">How to choose a track</h3>
+  <p className="mt-1 text-sm">
+    Select a track that best matches your interests and career goals. Each track provides
+    skills and knowledge in a specific area, choose the one that excites you the most to
+    get started!
+  </p>
+</div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {tracks.map((track) => (
           <div
