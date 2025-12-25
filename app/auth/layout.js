@@ -7,7 +7,7 @@ function Layout({ children }) {
         {/* Left Image / Testimonial */}
         <div className="hidden md:block relative">
           <img
-            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
+            src="https://unitar.org/sites/default/files/media/image/african-american-woman-with-laptop-outdoors-2023-03-22-15-30-04-utc.jpg"
             alt="Farm work illustration"
             className="absolute inset-0 h-full w-full object-cover"
           />
