@@ -1,5 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { AxiosGetService, AxiosPostService } from "../../../../constants/AxiosService";
+import {
+  AxiosGetService,
+  AxiosPostService,
+} from "../../../../constants/AxiosService";
 
 const initialState = {
   language: 0,
@@ -8,12 +11,18 @@ const initialState = {
     error: null,
     loading: false,
   },
-   cohortsState: {
+  cohortsState: {
     data: [],
     error: null,
     loading: false,
   },
   myEnrolmentState: {
+    data: [],
+    error: null,
+    loading: false,
+  },
+  // ✅ NEW
+  learningProgressState: {
     data: [],
     error: null,
     loading: false,
@@ -42,7 +51,7 @@ export const getTracksDetail = createAsyncThunk(
   "app/getTracksDetail",
   async (uuid, { rejectWithValue }) => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_TRACKS_URL}${uuid}/`
+      const url = `${process.env.NEXT_PUBLIC_TRACKS_URL}${uuid}/`;
       const res = await AxiosGetService(url);
       return res.data;
     } catch (err) {
@@ -52,7 +61,7 @@ export const getTracksDetail = createAsyncThunk(
     }
   }
 );
- 
+
 export const getCohorts = createAsyncThunk(
   "app/getCohorts",
   async (_, { rejectWithValue }) => {
@@ -78,7 +87,6 @@ export const selectTrack = createAsyncThunk(
       const res = await AxiosPostService(url, dataPassed, false);
       return res.data; // { access, user }
     } catch (err) {
-
       return rejectWithValue(err || "Login failed");
     }
   }
@@ -99,6 +107,20 @@ export const getMyEnrollment = createAsyncThunk(
   }
 );
 
+export const getMyLearningProgress = createAsyncThunk(
+  "app/getMyLearningProgress",
+  async (_, { rejectWithValue }) => {
+    try {
+      const url = process.env.NEXT_PUBLIC_LEARNING_PROGRESS_URL;
+      const res = await AxiosGetService(url);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to fetch learning progress"
+      );
+    }
+  }
+);
 const appSlice = createSlice({
   name: "app",
   initialState,
@@ -128,8 +150,7 @@ const appSlice = createSlice({
         state.tracksState.data = [];
       });
 
-
-       builder
+    builder
       // 🔄 Pending
       .addCase(getCohorts.pending, (state) => {
         state.cohortsState.loading = true;
@@ -149,7 +170,7 @@ const appSlice = createSlice({
         state.cohortsState.data = [];
       });
 
-      builder
+    builder
       // 🔄 Pending
       .addCase(getMyEnrollment.pending, (state) => {
         state.myEnrolmentState.loading = true;
@@ -167,6 +188,25 @@ const appSlice = createSlice({
         state.myEnrolmentState.loading = false;
         state.myEnrolmentState.error = action.payload;
         state.myEnrolmentState.data = [];
+      });
+    builder
+      // 🔄 Pending
+      .addCase(getMyLearningProgress.pending, (state) => {
+        state.learningProgressState.loading = true;
+        state.learningProgressState.error = null;
+      })
+
+      // ✅ Success
+      .addCase(getMyLearningProgress.fulfilled, (state, action) => {
+        state.learningProgressState.loading = false;
+        state.learningProgressState.data = action.payload;
+      })
+
+      // ❌ Error
+      .addCase(getMyLearningProgress.rejected, (state, action) => {
+        state.learningProgressState.loading = false;
+        state.learningProgressState.error = action.payload;
+        state.learningProgressState.data = [];
       });
   },
 });

@@ -1,7 +1,9 @@
 "use client";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getMyEnrollment } from "../app-redux/features/AppData/appSlice";
+import { getMyEnrollment, getMyLearningProgress } from "../app-redux/features/AppData/appSlice";
+import { FormatDate } from "../../constants/utils";
+import AILiteracyOutcome from "./pagecomponents/AILiteracyOutcome";
 
 export default function page() {
   let dispatch = useDispatch();
@@ -13,12 +15,16 @@ export default function page() {
   const lastName = loginState?.data?.user?.last_name || "";
 
   const initials = (firstName[0] || "") + (lastName[0] || "");
-  let { myEnrolmentState } = appData;
+  let { myEnrolmentState ,learningProgressState} = appData;
   let myEnrolmentStateData = myEnrolmentState?.data[0] || null;
+  let learningProgressStateData = learningProgressState?.data[0] || null;
+
 
   useEffect(() => {
     // get my enrolment
     dispatch(getMyEnrollment());
+    dispatch(getMyLearningProgress());
+
   }, []);
 
   return (
@@ -31,7 +37,7 @@ export default function page() {
           </div>
 
           {/* {
-            JSON?.stringify(myEnrolmentStateData)
+            JSON?.stringify(learningProgressStateData)
           } */}
 
           <div>
@@ -49,8 +55,8 @@ export default function page() {
             </p>
             <p className="text-xs text-gray-400">
               {myEnrolmentStateData?.cohort?.name || "-"} ·{" "}
-              {myEnrolmentStateData?.cohort?.start_date} –{" "}
-              {myEnrolmentStateData?.cohort?.end_date || "-"}
+              {FormatDate(myEnrolmentStateData?.cohort?.start_date,false)} –{" "}
+              {FormatDate(myEnrolmentStateData?.cohort?.end_date,false) || "-"}
             </p>
           </div>
         </div>
@@ -59,6 +65,8 @@ export default function page() {
           View Track
         </button>
       </div>
+
+      <AILiteracyOutcome learningProgressStateData={learningProgressStateData} />
 
       {/* Track Overview */}
       <div className="bg-white rounded-xl shadow-sm p-6">

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Users, Video } from "lucide-react";
 import LoadingSpinner from "./LoadingSpinner";
+import { FormatDate } from "../constants/utils";
 
 function ViewTrackToSelect({
   track,
@@ -114,7 +115,7 @@ function ViewTrackToSelect({
 
                       {cohort?.start_date && (
                         <p className="text-xs text-gray-500 mt-1">
-                          {cohort.start_date} – {cohort.end_date}
+                          {FormatDate(cohort.start_date,false)} – {FormatDate(cohort.end_date,false)}
                         </p>
                       )}
                     </div>
