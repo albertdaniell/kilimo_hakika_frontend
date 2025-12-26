@@ -12,8 +12,7 @@ export default function DashboardLayout({ children }) {
         <SideNav />
 
         {/* Main Content */}
-        <main className="ml-64 w-full h-[calc(100vh-4rem)] overflow-y-auto bg-gray-50 p-6">
-          {children}
+<main className="md:ml-64 w-full h-[calc(100vh-4rem)] overflow-y-auto bg-gray-50 p-6">          {children}
         </main>
       </div>
     </div>

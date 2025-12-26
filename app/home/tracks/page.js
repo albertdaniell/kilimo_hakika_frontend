@@ -1,93 +1,154 @@
-import React from "react";
-
-const tracks = [
-  {
-    id: "1a2b3c4d-0001-0000-0000-000000000001",
-    name: "Economic Pathways",
-    short_name: "EconPath",
-    description: "Learn key concepts of economics, financial literacy, and pathways to generate sustainable income.",
-    track_image: "https://img.icons8.com/fluency/48/000000/economy.png",
-    created_at: "2025-12-25T08:30:00.000+03:00",
-    updated_at: "2025-12-25T08:30:00.000+03:00"
-  },
-  {
-    id: "1a2b3c4d-0002-0000-0000-000000000002",
-    name: "Digital Agric",
-    short_name: "DigAgric",
-    description: "Gain hands-on skills in modern digital agriculture, precision farming, and technology-driven crop management.",
-    track_image: "https://img.icons8.com/fluency/48/000000/tractor.png",
-    created_at: "2025-12-25T08:31:00.000+03:00",
-    updated_at: "2025-12-25T08:31:00.000+03:00"
-  },
-  {
-    id: "1a2b3c4d-0003-0000-0000-000000000003",
-    name: "Gig Economy",
-    short_name: "GigEco",
-    description: "Explore opportunities in the gig economy, freelancing, and flexible digital work for income generation.",
-    track_image: "https://img.icons8.com/fluency/48/000000/freelancer.png",
-    created_at: "2025-12-25T08:32:00.000+03:00",
-    updated_at: "2025-12-25T08:32:00.000+03:00"
-  },
-  {
-    id: "1a2b3c4d-0004-0000-0000-000000000004",
-    name: "Creative Economy",
-    short_name: "CreatEco",
-    description: "Develop creative skills in arts, media, design, and content creation to thrive in the creative sector.",
-    track_image: "https://img.icons8.com/fluency/48/000000/creativity.png",
-    created_at: "2025-12-25T08:33:00.000+03:00",
-    updated_at: "2025-12-25T08:33:00.000+03:00"
-  },
-  {
-    id: "1a2b3c4d-0005-0000-0000-000000000005",
-    name: "IT Technician",
-    short_name: "ITTech",
-    description: "Acquire technical IT skills, including hardware, software, networking, and troubleshooting for career growth.",
-    track_image: "https://img.icons8.com/fluency/48/000000/computer-support.png",
-    created_at: "2025-12-25T08:34:00.000+03:00",
-    updated_at: "2025-12-25T08:34:00.000+03:00"
-  }
-];
+"use client";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getCohorts,
+  getTracks,
+  getTracksDetail,
+  selectTrack,
+} from "../../app-redux/features/AppData/appSlice";
+import { TrackSkeleton } from "../../../components/skeletons/TrackSkeleton";
+import TrackCard from "../../../components/TrackCard";
+import AppModal from "../../../components/AppModal";
+import ViewTrackToSelect from "../../../components/ViewTrackToSelect";
 
 export default function TracksPage() {
-  return (
-    <div className="px-8 min-h-screen mt-3">
-      <h1 className="text-3xl font-bold mb-6 text-slate-700">Available Tracks</h1>
-<div className="p-4 mb-6 bg-green-50 border-l-4 border-green-500 rounded-md text-green-700">
-  <h3 className="font-semibold text-lg">How to choose a track</h3>
-  <p className="mt-1 text-sm">
-    Select a track that best matches your interests and career goals. Each track provides
-    skills and knowledge in a specific area, choose the one that excites you the most to
-    get started!
-  </p>
-</div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {tracks.map((track) => (
-          <div
-            key={track.id}
-            className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col p-6"
-          >
-            {/* Track Info with small icon */}
-            <div className="flex items-center gap-4 mb-4">
-              <img
-                src={track.track_image}
-                alt={track.name}
-                className="w-12 h-12 object-cover rounded-full"
-              />
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">{track.name}</h2>
-                <p className="text-gray-500">{track.description}</p>
-              </div>
-            </div>
+  let appData = useSelector((state) => state.appData);
+  let { tracksState, cohortsState } = appData;
+  let { data: tracks } = tracksState;
+  let { data: cohorts } = cohortsState;
+  let [trackSelected, set_trackSelected] = useState(null);
+  let [modalOpen, set_modalOpen] = useState(null);
+  let [selectedCohort, set_selectedCohort] = useState(null);
+  let [loadingSelectTrack, set_loadingSelectTrack] = useState(null);
+  let [errorSelectTrack, set_errorSelectTrack] = useState(null);
+  let [successSelectTrack, set_successSelectTrack] = useState(null);
 
-            {/* Select Button */}
-            <button
-              className="mt-auto bg-green-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition"
-            >
-              Select Track
-            </button>
+  let dispatch = useDispatch();
+
+  let getTracksDetailFn = (data) => {
+    set_loadingSelectTrack(true);
+
+    set_modalOpen(true);
+    set_trackSelected(null);
+    set_errorSelectTrack(null);
+    set_successSelectTrack(null);
+
+     setTimeout(() => {
+        dispatch(getTracksDetail(data?.id))
+      .unwrap()
+      .then((res) => {
+        set_loadingSelectTrack(false);
+
+        set_trackSelected(res);
+      })
+      .catch((err) => {
+        set_loadingSelectTrack(false);
+
+      });
+    }, 1000);
+
+  
+  };
+
+  let selectCohort = (data) => {
+    set_selectedCohort(data);
+  };
+
+  let selectTrackUser = () => {
+    set_loadingSelectTrack(true);
+    set_errorSelectTrack(null);
+    set_successSelectTrack(null);
+    let dataPassed = {
+      track: trackSelected?.id,
+      cohort: selectedCohort,
+    };
+    // alert(JSON.stringify(dataPassed))
+
+    // return 0
+    dispatch(
+      selectTrack({
+        dataPassed,
+      })
+    )
+      .unwrap()
+      .then((res) => {
+        console.log(res)
+        set_loadingSelectTrack(false);
+
+        set_successSelectTrack(
+         res?.detail || `You have successfully enrolled to this ${trackSelected?.name} track.`
+        );
+      })
+      .catch((err) => {
+        set_loadingSelectTrack(false);
+        console.log(err);
+        set_errorSelectTrack(err?.response?.data?.detail);
+        console.log({ err });
+      });
+  };
+
+  useEffect(() => {
+    dispatch(getTracks());
+    dispatch(getCohorts());
+  }, []);
+  return (
+    <>
+      <AppModal
+        setIsClose={() => {
+          set_modalOpen(false);
+        }}
+        body={
+          <>
+            <ViewTrackToSelect
+              loadingSelectTrack={loadingSelectTrack}
+              error={errorSelectTrack}
+              success={successSelectTrack}
+              onSelect={selectTrackUser}
+              selectedCohort={selectedCohort}
+              selectCohort={selectCohort}
+              cohorts={cohorts}
+              track={trackSelected}
+            />
+          </>
+        }
+        isOpen={modalOpen}
+      />
+      <div className="min-h-screen mt-3">
+        <h1 className="text-3xl font-bold mb-6 text-slate-700">
+          Available Tracks
+        </h1>
+        {/* {
+        JSON.stringify(trackSelected)
+      } */}
+
+        <div className="p-4 mb-6 bg-green-50 border-l-4 border-green-500 rounded-md text-green-700">
+          <h3 className="font-semibold text-lg">How to choose a track</h3>
+          <p className="mt-1 text-sm">
+            Select a track that best matches your interests and career goals.
+            Each track provides skills and knowledge in a specific area, choose
+            the one that excites you the most to get started!
+          </p>
+        </div>
+
+        {tracksState?.loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <TrackSkeleton key={i} />
+            ))}
           </div>
-        ))}
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {tracks.map((track) => (
+              <TrackCard
+                onSelect={getTracksDetailFn}
+                key={track?.id}
+                track={track}
+              ></TrackCard>
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </>
   );
 }
