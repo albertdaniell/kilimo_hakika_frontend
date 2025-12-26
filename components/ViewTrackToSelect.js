@@ -14,8 +14,9 @@ function ViewTrackToSelect({
   loadingSelectTrack,
 }) {
   const meeting = track?.meeting;
-  // const hasMeetingLink = meeting?.join_url;
-  const hasMeetingLink = meeting;
+  const hasMeetingLink = meeting?.join_url;
+  let has_registered_for_meeting = track?.has_registered_for_meeting
+  // const hasMeetingLink = meeting;
   let has_selected_this_track = track?.has_selected_this_track;
 
   useEffect(() => {
@@ -55,7 +56,7 @@ function ViewTrackToSelect({
           </div>
 
           {/* Meeting Section */}
-          {hasMeetingLink && has_selected_this_track && (
+          {has_registered_for_meeting && has_selected_this_track && (
             <div className="mb-5 bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-2 text-blue-700 text-sm font-medium">
                 <Video className="w-4 h-4" />
@@ -63,7 +64,7 @@ function ViewTrackToSelect({
               </div>
 
               <a
-                href={"#"}
+                href={track?.meeting?.json?.start_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm font-semibold text-blue-600 hover:underline"

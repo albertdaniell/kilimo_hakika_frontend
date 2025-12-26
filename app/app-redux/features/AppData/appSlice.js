@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  AxiosDeleteService,
   AxiosGetService,
   AxiosPostService,
 } from "../../../../constants/AxiosService";
@@ -53,6 +54,11 @@ const initialState = {
     loading: false,
     error: null,
     success: false,
+  },
+  registerMeetingState: {
+    data: null,
+    loading: false,
+    error: null,
   },
 };
 
@@ -294,6 +300,24 @@ export const deleteTrackMeeting = createAsyncThunk(
   }
 );
 
+export const registerForMeeting = createAsyncThunk(
+  "app/registerForMeeting",
+  async ({ meeting_id }, { rejectWithValue }) => {
+    try {
+      const url = process.env.NEXT_PUBLIC_TRACK_MEETINGS_REGISTER_URL;
+      // example: /api/meetings/register/
+
+      const res = await AxiosPostService(url, { meeting_id }, false);
+
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to register for meeting"
+      );
+    }
+  }
+);
+
 const appSlice = createSlice({
   name: "app",
   initialState,
@@ -495,6 +519,24 @@ const appSlice = createSlice({
       .addCase(deleteTrackMeeting.rejected, (state, action) => {
         state.deleteMeetingState.loading = false;
         state.deleteMeetingState.error = action.payload;
+      });
+    // ===============================
+    // REGISTER FOR MEETING
+    // ===============================
+    builder
+      .addCase(registerForMeeting.pending, (state) => {
+        state.registerMeetingState.loading = true;
+        state.registerMeetingState.error = null;
+      })
+
+      .addCase(registerForMeeting.fulfilled, (state, action) => {
+        state.registerMeetingState.loading = false;
+        state.registerMeetingState.data = action.payload;
+      })
+
+      .addCase(registerForMeeting.rejected, (state, action) => {
+        state.registerMeetingState.loading = false;
+        state.registerMeetingState.error = action.payload;
       });
   },
 });
