@@ -12,6 +12,10 @@ const navItems = [
   { name: "Meeting", link: "/home/meeting" },
   { name: "Surveys", link: "/home/surveys" },
   { name: "Certificates", link: "/home/certificates" },
+  { name: "Learning Materials", link: "/home/learning-materials" },
+  { name: "Support", link: "/home/support" },
+
+
 ];
 
 export default function SideNav() {

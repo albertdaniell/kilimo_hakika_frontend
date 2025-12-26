@@ -36,7 +36,7 @@ export default function page() {
 
           <div>
             <h2 className="font-semibold text-lg">
-              Daniel Albert Agoya {loginState?.data?.user?.first_name}{" "}
+              {loginState?.data?.user?.first_name}{" "}
               {loginState?.data?.user?.last_name}
             </h2>
             {/* ✅ Email */}
@@ -65,23 +65,26 @@ export default function page() {
         <h3 className="text-lg font-semibold mb-4">Track Overview</h3>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <Info label="Track Name"
-          
-          className="text-purple-600"
-          
-          value={myEnrolmentStateData?.track?.name || "-"} />
-          <Info label="Cohort"
-          className="text-yellow-600"
-          
-          value={myEnrolmentStateData?.cohort?.name || "-"} />
+          <Info
+            label="Track Name"
+            className="text-purple-600"
+            value={myEnrolmentStateData?.track?.name || "-"}
+          />
+          <Info
+            label="Cohort"
+            className="text-yellow-600"
+            value={myEnrolmentStateData?.cohort?.name || "-"}
+          />
           <Info
             label="Enrolled Trainees"
             className="text-blue-600"
             value={myEnrolmentStateData?.track?.enrolled_trainees || "-"}
           />
-          <Info label="Status" 
-          className="text-green-600"
-          value={myEnrolmentStateData?"Active":"-"} />
+          <Info
+            label="Status"
+            className="text-green-600"
+            value={myEnrolmentStateData ? "Active" : "-"}
+          />
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6">
@@ -106,30 +109,28 @@ export default function page() {
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h3 className="text-lg font-semibold mb-4">Upcoming Meeting</h3>
 
-        {
-          myEnrolmentStateData?.track?.meeting ? 
-
+        {myEnrolmentStateData?.track?.meeting ? (
           <>
-           <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium">{myEnrolmentStateData?.track?.meeting?.name}</p>
-            <p className="text-sm text-gray-500">
-              Wednesday · 10:00 AM – 12:00 PM
-            </p>
-          </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">
+                  {myEnrolmentStateData?.track?.meeting?.name}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Wednesday · 10:00 AM – 12:00 PM
+                </p>
+              </div>
 
-          <button className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-600 transition">
-            Join Meeting
-          </button>
-        </div>
-          </>:
-
-          <>
-          <p>No upcoming meeting</p>
+              <button className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-600 transition">
+                Join Meeting
+              </button>
+            </div>
           </>
-        }
-
-       
+        ) : (
+          <>
+            <p>No upcoming meeting</p>
+          </>
+        )}
       </div>
 
       {/* 🎥 Motivational Video Section */}
@@ -150,10 +151,16 @@ export default function page() {
           {/* Video */}
           <div className="w-full aspect-video bg-green-700 rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
             {/* Replace src with real video later */}
-            <video controls className="w-full h-full object-cover">
-              <source src="/sample-video.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+            <div className="w-full aspect-video rounded-xl overflow-hidden shadow-inner">
+              <iframe
+                className="w-full h-full"
+                src="https://www.youtube.com/embed/581Kx8wzTMc"
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -164,12 +171,8 @@ export default function page() {
 function Info({ label, value, className = "" }) {
   return (
     <div>
-      <p className="text-gray-500 text-xs uppercase tracking-wide">
-        {label}
-      </p>
-      <p className={`font-medium text-sm ${className}`}>
-        {value}
-      </p>
+      <p className="text-gray-500 text-xs uppercase tracking-wide">{label}</p>
+      <p className={`font-medium text-sm ${className}`}>{value}</p>
     </div>
   );
 }
