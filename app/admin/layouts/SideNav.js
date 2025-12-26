@@ -10,6 +10,8 @@ const navItems = [
   { name: "Profile", link: "/admin/profile" },
   { name: "Tracks", link: "/admin/tracks" },
   { name: "Cohort", link: "/admin/cohorts" },
+  { name: "Meetings", link: "/admin/meetings" },
+
   { name: "Surveys", link: "/admin/surveys" },
   { name: "Certificates", link: "/home/certificates" },
  

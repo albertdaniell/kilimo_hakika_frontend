@@ -37,6 +37,23 @@ const initialState = {
     error: null,
     loading: false,
   },
+  // ✅ NEW: Meetings (ADMIN)
+  meetingsState: {
+    data: [],
+    error: null,
+    loading: false,
+  },
+
+  createMeetingState: {
+    data: null,
+    error: null,
+    loading: false,
+  },
+  deleteMeetingState: {
+    loading: false,
+    error: null,
+    success: false,
+  },
 };
 
 /**
@@ -232,6 +249,51 @@ export const getAdminDashboardStats = createAsyncThunk(
   }
 );
 
+export const getTrackMeetings = createAsyncThunk(
+  "app/getTrackMeetings",
+  async (_, { rejectWithValue }) => {
+    try {
+      const url = process.env.NEXT_PUBLIC_TRACK_MEETINGS_URL;
+      const res = await AxiosGetService(url);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to fetch meetings"
+      );
+    }
+  }
+);
+
+export const createTrackMeeting = createAsyncThunk(
+  "app/createTrackMeeting",
+  async (data, { rejectWithValue }) => {
+    try {
+      const url = process.env.NEXT_PUBLIC_TRACK_MEETINGS_CREATE_URL;
+      const res = await AxiosPostService(url, data, false);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to create meeting"
+      );
+    }
+  }
+);
+
+export const deleteTrackMeeting = createAsyncThunk(
+  "app/deleteTrackMeeting",
+  async (meetingId, { rejectWithValue }) => {
+    try {
+      const url = `${process.env.NEXT_PUBLIC_TRACK_MEETINGS_URL}${meetingId}/delete/`;
+      const res = await AxiosDeleteService(url);
+      return { meetingId, data: res.data };
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to delete meeting"
+      );
+    }
+  }
+);
+
 const appSlice = createSlice({
   name: "app",
   initialState,
@@ -373,6 +435,66 @@ const appSlice = createSlice({
         state.adminDashboardStatsState.loading = false;
         state.adminDashboardStatsState.error = action.payload;
         state.adminDashboardStatsState.data = null;
+      });
+
+    // ============================
+    // GET MEETINGS
+    // ============================
+    builder
+      .addCase(getTrackMeetings.pending, (state) => {
+        state.meetingsState.loading = true;
+        state.meetingsState.error = null;
+      })
+      .addCase(getTrackMeetings.fulfilled, (state, action) => {
+        state.meetingsState.loading = false;
+        state.meetingsState.data = action.payload;
+      })
+      .addCase(getTrackMeetings.rejected, (state, action) => {
+        state.meetingsState.loading = false;
+        state.meetingsState.error = action.payload;
+        state.meetingsState.data = [];
+      });
+
+    // ============================
+    // CREATE MEETING
+    // ============================
+    builder
+      .addCase(createTrackMeeting.pending, (state) => {
+        state.createMeetingState.loading = true;
+        state.createMeetingState.error = null;
+      })
+      .addCase(createTrackMeeting.fulfilled, (state, action) => {
+        state.createMeetingState.loading = false;
+        state.createMeetingState.data = action.payload;
+
+        // 🔄 Push newly created meeting into list
+        state.meetingsState.data.unshift(action.payload);
+      })
+      .addCase(createTrackMeeting.rejected, (state, action) => {
+        state.createMeetingState.loading = false;
+        state.createMeetingState.error = action.payload;
+      });
+    // ============================
+    // DELETE MEETING
+    // ============================
+    builder
+      .addCase(deleteTrackMeeting.pending, (state) => {
+        state.deleteMeetingState.loading = true;
+        state.deleteMeetingState.error = null;
+        state.deleteMeetingState.success = false;
+      })
+      .addCase(deleteTrackMeeting.fulfilled, (state, action) => {
+        state.deleteMeetingState.loading = false;
+        state.deleteMeetingState.success = true;
+
+        // 🔄 Mark meeting inactive in meetings list
+        state.meetingsState.data = state.meetingsState.data.map((m) =>
+          m.id === action.payload.meetingId ? { ...m, is_active: false } : m
+        );
+      })
+      .addCase(deleteTrackMeeting.rejected, (state, action) => {
+        state.deleteMeetingState.loading = false;
+        state.deleteMeetingState.error = action.payload;
       });
   },
 });

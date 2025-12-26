@@ -39,7 +39,7 @@ export default function AdminDashboard() {
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          Admin Dashboard
+          Admin Dashboard - {data?.active_cohorts_data?.name}
         </h1>
         <p className="text-sm text-gray-500">
           Overview of training programmes, cohorts, and trainee engagement
@@ -50,9 +50,9 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           icon={<Users className="w-5 h-5" />}
-          label="Total Trainees"
-          value={data.total_trainees}
-          note={`+${data.this_month_trainees} this month`}
+          label={`Total Enrolled Trainees`}
+          value={`${data.total_trainees}`}
+          note={`${data?.total_trainee_users} total trainees - +${data.this_month_trainees} this month`}
           color="green"
         />
         <StatCard
@@ -65,8 +65,12 @@ export default function AdminDashboard() {
         <StatCard
           icon={<CalendarDays className="w-5 h-5" />}
           label="Active Cohorts"
-          value={data.active_cohorts}
-          note="Currently running"
+          value={`${data.active_cohorts}`}
+          
+          note={`Currently running of ${data?.all_cohorts} cohorts`}
+
+        //   value={data.active_cohorts}
+        //   note="Currently running"
           color="indigo"
         />
         <StatCard
@@ -81,7 +85,7 @@ export default function AdminDashboard() {
       {/* Track Enrolments */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
         <h2 className="text-lg font-semibold mb-4">
-          Enrolments by Track
+          Enrolments by Track for {data?.active_cohorts_data?.name}
         </h2>
         {/* 📈 Enrolments Per Day Chart */}
 
