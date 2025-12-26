@@ -73,7 +73,7 @@ function Stat({ label, value, highlight }) {
     <div
       className={`rounded-xl p-4 text-center ${
         highlight
-          ? "bg-green-600 text-white"
+          ? "bg-green-300 text-slate-700 border border-green-400"
           : "bg-gray-50 border border-gray-200"
       }`}
     >
