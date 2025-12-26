@@ -27,6 +27,16 @@ const initialState = {
     error: null,
     loading: false,
   },
+  adminCohortsState: {
+    data: [],
+    error: null,
+    loading: false,
+  },
+  adminDashboardStatsState: {
+    data: null,
+    error: null,
+    loading: false,
+  },
 };
 
 /**
@@ -121,6 +131,107 @@ export const getMyLearningProgress = createAsyncThunk(
     }
   }
 );
+
+/**
+ * FETCH ALL COHORTS (ADMIN)
+ */
+export const getAdminCohorts = createAsyncThunk(
+  "app/getAdminCohorts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await AxiosGetService(
+        process.env.NEXT_PUBLIC_COHORT_ADMIN_URL
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to fetch cohorts"
+      );
+    }
+  }
+);
+
+/**
+ * CREATE COHORT
+ */
+export const createCohort = createAsyncThunk(
+  "app/createCohort",
+  async (dataPassed, { rejectWithValue }) => {
+    try {
+      const res = await AxiosPostService(
+        process.env.NEXT_PUBLIC_COHORT_CREATE_URL,
+        dataPassed,
+        false
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to create cohort"
+      );
+    }
+  }
+);
+
+/**
+ * UPDATE COHORT
+ */
+export const updateCohort = createAsyncThunk(
+  "app/updateCohort",
+  async ({ id, dataPassed }, { rejectWithValue }) => {
+    try {
+      const res = await AxiosPostService(
+        `${process.env.NEXT_PUBLIC_COHORT_UPDATE_URL}${id}/update/`,
+        dataPassed,
+        false
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to update cohort"
+      );
+    }
+  }
+);
+
+/**
+ * DELETE COHORT
+ */
+export const deleteCohort = createAsyncThunk(
+  "app/deleteCohort",
+  async (id, { rejectWithValue }) => {
+    try {
+      await AxiosPostService(
+        `${process.env.NEXT_PUBLIC_COHORT_DELETE_URL}${id}/delete/`,
+        {},
+        false
+      );
+      return id;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to delete cohort"
+      );
+    }
+  }
+);
+
+/**
+ * ADMIN DASHBOARD STATS
+ */
+export const getAdminDashboardStats = createAsyncThunk(
+  "app/getAdminDashboardStats",
+  async (_, { rejectWithValue }) => {
+    try {
+      const url = process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_STATS_URL;
+      const res = await AxiosGetService(url);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to fetch admin dashboard stats"
+      );
+    }
+  }
+);
+
 const appSlice = createSlice({
   name: "app",
   initialState,
@@ -207,6 +318,61 @@ const appSlice = createSlice({
         state.learningProgressState.loading = false;
         state.learningProgressState.error = action.payload;
         state.learningProgressState.data = [];
+      });
+
+    builder
+      // =========================
+      // ADMIN COHORTS
+      // =========================
+
+      .addCase(getAdminCohorts.pending, (state) => {
+        state.adminCohortsState.loading = true;
+        state.adminCohortsState.error = null;
+      })
+      .addCase(getAdminCohorts.fulfilled, (state, action) => {
+        state.adminCohortsState.loading = false;
+        state.adminCohortsState.data = action.payload;
+      })
+      .addCase(getAdminCohorts.rejected, (state, action) => {
+        state.adminCohortsState.loading = false;
+        state.adminCohortsState.error = action.payload;
+      })
+
+      .addCase(createCohort.fulfilled, (state, action) => {
+        state.adminCohortsState.data.unshift(action.payload);
+      })
+
+      .addCase(updateCohort.fulfilled, (state, action) => {
+        state.adminCohortsState.data = state.adminCohortsState.data.map(
+          (cohort) =>
+            cohort.id === action.payload.id ? action.payload : cohort
+        );
+      })
+
+      .addCase(deleteCohort.fulfilled, (state, action) => {
+        state.adminCohortsState.data = state.adminCohortsState.data.filter(
+          (cohort) => cohort.id !== action.payload
+        );
+      });
+
+    builder
+      // ======================================
+      // ADMIN DASHBOARD STATS
+      // ======================================
+      .addCase(getAdminDashboardStats.pending, (state) => {
+        state.adminDashboardStatsState.loading = true;
+        state.adminDashboardStatsState.error = null;
+      })
+
+      .addCase(getAdminDashboardStats.fulfilled, (state, action) => {
+        state.adminDashboardStatsState.loading = false;
+        state.adminDashboardStatsState.data = action.payload;
+      })
+
+      .addCase(getAdminDashboardStats.rejected, (state, action) => {
+        state.adminDashboardStatsState.loading = false;
+        state.adminDashboardStatsState.error = action.payload;
+        state.adminDashboardStatsState.data = null;
       });
   },
 });

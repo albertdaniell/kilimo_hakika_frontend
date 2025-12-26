@@ -30,11 +30,16 @@ export default function Login() {
   };
 
   // ✅ Redirect after successful login
-  useEffect(() => {
-    if (data?.access) {
+  // ✅ Redirect after successful login based on role
+useEffect(() => {
+  if (data?.access && data?.user?.role) {
+    if (data.user.role === "TRAINEE") {
       router.push("/home");
+    } else if (data.user.role === "ADMIN") {
+      router.push("/admin");
     }
-  }, [data, router]);
+  }
+}, [data, router]);
 
   return (
     <div className="w-full max-w-md">
