@@ -4,7 +4,15 @@ import { useEffect } from "react";
 import { Users, Layers, CalendarDays, BarChart3 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAdminDashboardStats } from "@/app/app-redux/features/AppData/appSlice";
-
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
 export default function AdminDashboard() {
   const dispatch = useDispatch();
 
@@ -75,6 +83,7 @@ export default function AdminDashboard() {
         <h2 className="text-lg font-semibold mb-4">
           Enrolments by Track
         </h2>
+        {/* 📈 Enrolments Per Day Chart */}
 
         <div className="space-y-3">
           {data.enrollments_per_track.map((track) => (
@@ -86,6 +95,7 @@ export default function AdminDashboard() {
           ))}
         </div>
       </div>
+<EnrollmentPerDayChart data={data.enrollments_per_day} />
 
       {/* Engagement & Meetings (still static placeholders) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -192,6 +202,48 @@ function TrackRow({ name, value }) {
           className="h-full bg-green-500 rounded-full"
           style={{ width: `${percentage}%` }}
         />
+      </div>
+    </div>
+  );
+}
+
+
+
+function EnrollmentPerDayChart({ data = [] }) {
+  if (!data.length) {
+    return (
+      <p className="text-sm text-gray-500">
+        No enrollment data available
+      </p>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-6">
+      <h2 className="text-lg font-semibold mb-4">
+        Enrolments Per Day
+      </h2>
+
+      <div className="h-72">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+            <XAxis
+              dataKey="date"
+              tick={{ fontSize: 12 }}
+            />
+            <YAxis allowDecimals={false} />
+            <Tooltip />
+            <Line
+              type="monotone"
+              dataKey="total"
+              stroke="#22c55e"
+              strokeWidth={3}
+              dot={{ r: 4 }}
+              activeDot={{ r: 6 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
