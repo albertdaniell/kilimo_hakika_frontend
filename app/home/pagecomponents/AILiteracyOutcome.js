@@ -93,7 +93,7 @@ function Info({ label, value }) {
       <p className="text-gray-500 text-xs uppercase tracking-wide">
         {label}
       </p>
-      <p className="font-medium text-sm text-gray-800">
+      <p className="font-normal text-sm text-gray-800">
         {value || "-"}
       </p>
     </div>
