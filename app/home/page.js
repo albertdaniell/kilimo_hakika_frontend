@@ -5,6 +5,7 @@ import {
   getMyBaselineSurvey,
   getMyEnrollment,
   getMyLearningProgress,
+  getMyTrackSurveys,
   registerForMeeting,
 } from "../app-redux/features/AppData/appSlice";
 import { FormatDate } from "../../constants/utils";
@@ -35,7 +36,9 @@ export default function page() {
   /* ===========================
      BASELINE STATUS
   =========================== */
-  const baselineCompleted = !!myBaselineSurveyState?.data;
+  const { loading, error, data:myTrackSurveysStateData } = useSelector(
+    (state) => state.appData.myTrackSurveysState
+  );
 
   /* ===========================
      USER INFO
@@ -52,6 +55,18 @@ export default function page() {
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [registerMeetingError, set_registerMeetingError] = useState(null);
   const [registerMeetingSuccess, set_registerMeetingSuccess] = useState(null);
+  const [baseLineSurvey, set_baseLineSurvey] = useState(null);
+  const baselineCompleted = !!baseLineSurvey?.has_submitted;
+
+  useEffect(()=>{
+    let baseline = myTrackSurveysStateData?.find((d)=>{
+      return d.slug === "baseline-survey"
+    })
+    set_baseLineSurvey(baseline)
+
+
+  },[myTrackSurveysStateData])
+
 
   /* ===========================
      EFFECTS
@@ -59,6 +74,8 @@ export default function page() {
   useEffect(() => {
     dispatch(getMyEnrollment());
     dispatch(getMyLearningProgress());
+        dispatch(getMyTrackSurveys());
+    
     // dispatch(getMyBaselineSurvey())
   }, [dispatch]);
 
@@ -155,6 +172,10 @@ export default function page() {
             <AlertTriangle className="w-6 h-6 text-yellow-600" />
           )}
 
+        {/* baseLineSurvey  {
+            JSON.stringify(baseLineSurvey)
+          } */}
+
           <div>
             <p className="font-medium">
               Baseline Survey
@@ -169,10 +190,18 @@ export default function page() {
 
         {!baselineCompleted && (
           <Link
-            href="/survey/baseline"
+            href="/home/surveys/baseline-survey/"
             className="bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-yellow-700"
           >
             Complete Survey
+          </Link>
+        )}
+         {baselineCompleted && (
+          <Link
+            href="/home/surveys/baseline-survey/"
+            className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+          >
+            View Responses
           </Link>
         )}
       </div>
