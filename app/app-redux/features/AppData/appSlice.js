@@ -60,6 +60,11 @@ const initialState = {
     loading: false,
     error: null,
   },
+   myMeetingsState: {
+    loading: false,
+    error: null,
+    data: [],
+  },
 };
 
 /**
@@ -318,6 +323,26 @@ export const registerForMeeting = createAsyncThunk(
   }
 );
 
+/* =========================================
+   GET MY TRACK MEETINGS
+========================================= */
+export const getMyMeetings = createAsyncThunk(
+  "appData/getMyMeetings",
+  async (_, { rejectWithValue }) => {
+    try {
+      
+      const url = process.env.NEXT_PUBLIC_TRACK_MEETINGS_ME_URL;
+      const res = await AxiosGetService(url);
+
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err?.response?.data?.detail || "Failed to fetch meetings"
+      );
+    }
+  }
+);
+
 const appSlice = createSlice({
   name: "app",
   initialState,
@@ -538,6 +563,23 @@ const appSlice = createSlice({
         state.registerMeetingState.loading = false;
         state.registerMeetingState.error = action.payload;
       });
+
+      builder
+  /* ===============================
+     MY MEETINGS
+  =============================== */
+  .addCase(getMyMeetings.pending, (state) => {
+    state.myMeetingsState.loading = true;
+    state.myMeetingsState.error = null;
+  })
+  .addCase(getMyMeetings.fulfilled, (state, action) => {
+    state.myMeetingsState.loading = false;
+    state.myMeetingsState.data = action.payload;
+  })
+  .addCase(getMyMeetings.rejected, (state, action) => {
+    state.myMeetingsState.loading = false;
+    state.myMeetingsState.error = action.payload;
+  });
   },
 });
 
