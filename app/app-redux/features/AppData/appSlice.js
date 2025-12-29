@@ -75,6 +75,21 @@ const initialState = {
     error: null,
     data: null,
   },
+  myTrackSurveysState: {
+  loading: false,
+  error: null,
+  data: [],
+},
+surveyBySlugState: {
+  loading: false,
+  error: null,
+  data: null,
+},
+submitSurveyState: {
+  loading: false,
+  error: null,
+  success: false,
+},
 };
 
 /**
@@ -315,23 +330,6 @@ export const deleteTrackMeeting = createAsyncThunk(
   }
 );
 
-export const getMyBaselineSurvey = createAsyncThunk(
-  "app/getMyBaselineSurvey",
-  async (_, { rejectWithValue }) => {
-    try {
-      const url =
-        process.env.NEXT_PUBLIC_BASELINE_MY_RESPONSE_URL;
-      // example: /api/surveys/baseline/my-response/
-
-      const res = await AxiosGetService(url, false);
-      return res.data;
-    } catch (err) {
-      return rejectWithValue(
-        err.response?.data || "Failed to fetch baseline survey response"
-      );
-    }
-  }
-);
 
 export const registerForMeeting = createAsyncThunk(
   "app/registerForMeeting",
@@ -350,6 +348,25 @@ export const registerForMeeting = createAsyncThunk(
     }
   }
 );
+
+export const getMyBaselineSurvey = createAsyncThunk(
+  "app/getMyBaselineSurvey",
+  async (_, { rejectWithValue }) => {
+    try {
+      const url =
+        process.env.NEXT_PUBLIC_BASELINE_MY_RESPONSE_URL;
+      // example: /api/surveys/baseline/my-response/
+
+      const res = await AxiosGetService(url, false);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data || "Failed to fetch baseline survey response"
+      );
+    }
+  }
+);
+
 
 
 // app-redux/features/AppData/appSlice.js
@@ -390,6 +407,62 @@ export const getMyMeetings = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err?.response?.data?.detail || "Failed to fetch meetings"
+      );
+    }
+  }
+);
+
+export const getMyTrackSurveys = createAsyncThunk(
+  "app/getMyTrackSurveys",
+  async (_, { rejectWithValue }) => {
+    try {
+      const url = process.env.NEXT_PUBLIC_MY_TRACK_SURVEYS_URL;
+
+      const res = await AxiosGetService(url, false);
+
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to fetch track surveys"
+      );
+    }
+  }
+);
+
+export const getSurveyBySlug = createAsyncThunk(
+  "app/getSurveyBySlug",
+  async ({ slug }, { rejectWithValue }) => {
+    try {
+      const url = `${process.env.NEXT_PUBLIC_SURVEY_BY_SLUG_URL}/${slug}/`;
+      // example: http://localhost:8000/api/surveys/baseline-survey/
+
+      const res = await AxiosGetService(url, true);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to load survey"
+      );
+    }
+  }
+);
+
+export const submitSurveyResponses = createAsyncThunk(
+  "app/submitSurveyResponses",
+  async ({ survey_id, answers }, { rejectWithValue }) => {
+    try {
+      const url = process.env.NEXT_PUBLIC_SURVEY_SUBMIT_URL;
+      // POST /api/surveys/submit/
+
+      const res = await AxiosPostService(
+        url,
+        { survey_id, answers },
+        true
+      );
+
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to submit survey"
       );
     }
   }
@@ -674,6 +747,61 @@ builder
     state.myBaselineSurveyState.loading = false;
     state.myBaselineSurveyState.error = action.payload;
   });
+
+  builder
+
+  /* ===========================
+     MY TRACK SURVEYS
+  =========================== */
+  .addCase(getMyTrackSurveys.pending, (state) => {
+    state.myTrackSurveysState.loading = true;
+    state.myTrackSurveysState.error = null;
+  })
+
+  .addCase(getMyTrackSurveys.fulfilled, (state, action) => {
+    state.myTrackSurveysState.loading = false;
+    state.myTrackSurveysState.data = action.payload;
+  })
+
+  .addCase(getMyTrackSurveys.rejected, (state, action) => {
+    state.myTrackSurveysState.loading = false;
+    state.myTrackSurveysState.error = action.payload;
+  });
+
+  builder/* ===========================
+   SURVEY BY SLUG
+=========================== */
+.addCase(getSurveyBySlug.pending, (state) => {
+  state.surveyBySlugState.loading = true;
+  state.surveyBySlugState.error = null;
+})
+
+.addCase(getSurveyBySlug.fulfilled, (state, action) => {
+  state.surveyBySlugState.loading = false;
+  state.surveyBySlugState.data = action.payload;
+})
+
+.addCase(getSurveyBySlug.rejected, (state, action) => {
+  state.surveyBySlugState.loading = false;
+  state.surveyBySlugState.error = action.payload;
+});
+
+builder
+.addCase(submitSurveyResponses.pending, (state) => {
+  state.submitSurveyState.loading = true;
+  state.submitSurveyState.error = null;
+  state.submitSurveyState.success = false;
+})
+
+.addCase(submitSurveyResponses.fulfilled, (state) => {
+  state.submitSurveyState.loading = false;
+  state.submitSurveyState.success = true;
+})
+
+.addCase(submitSurveyResponses.rejected, (state, action) => {
+  state.submitSurveyState.loading = false;
+  state.submitSurveyState.error = action.payload;
+});
   },
 });
 
