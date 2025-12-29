@@ -5,9 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import { Loader2, CheckCircle } from "lucide-react";
 import {
+    getMySurveyResponses,
   getSurveyBySlug,
   submitSurveyResponses,
 } from "../../../app-redux/features/AppData/appSlice";
+import { FormatDate } from "../../../../constants/utils";
 
 export default function SurveyDetailPage() {
   const { slug } = useParams();
@@ -16,6 +18,12 @@ export default function SurveyDetailPage() {
   const { data: survey, loading, error } = useSelector(
     (state) => state.appData.surveyBySlugState
   );
+
+  const myResponsesState = useSelector(
+  (state) => state.appData.mySurveyResponsesState
+);
+
+const myResponses = myResponsesState?.data;
 
   const submitState = useSelector(
     (state) => state.appData.submitSurveyState
@@ -33,8 +41,34 @@ export default function SurveyDetailPage() {
   useEffect(() => {
     if (slug) {
       dispatch(getSurveyBySlug({ slug }));
+    dispatch(getMySurveyResponses({ slug }));
+
     }
   }, [dispatch, slug]);
+
+  useEffect(() => {
+  if (!myResponses?.answers?.length) return;
+  console.log(0)
+
+  const mapped = {};
+
+  myResponses.answers.forEach((ans) => {
+    mapped[ans.question_id] = {
+      question_id: ans.question_id,
+
+      // checkbox → array
+      value: ans.selected_choices?.length
+        ? ans.selected_choices.map((c) => c.value)
+        : ans.selected_choice
+        ? ans.selected_choice.value
+        : ans.answer_text ?? "",
+    };
+  });
+
+  console.log(mapped)
+
+  setAnswers(mapped);
+}, [myResponses]);
 
   /* ===========================
      HANDLE ANSWER CHANGE
@@ -82,7 +116,7 @@ export default function SurveyDetailPage() {
 
     dispatch(
       submitSurveyResponses({
-        survey_id: survey.id,
+        slug: slug,
         answers: Object.values(answers),
       })
     );
@@ -98,6 +132,10 @@ export default function SurveyDetailPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
+
+      {/* {
+        JSON.stringify(myResponses)
+      } */}
       <div>
         <h1 className="text-2xl font-semibold">{survey.name}</h1>
         <p className="text-sm text-gray-500">{survey.description}</p>
@@ -111,6 +149,14 @@ export default function SurveyDetailPage() {
         </div>
       )}
 
+      {
+        myResponses?.id &&
+         <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 rounded-lg p-4 text-sm">
+          <CheckCircle className="w-4 h-4" />
+          This survey was submitted on {FormatDate(myResponses?.submitted_at,true)}
+        </div>
+      }
+
       {/* Error */}
       {formError && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
@@ -122,6 +168,8 @@ export default function SurveyDetailPage() {
       <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
         {survey.questions.map((q, index) => (
           <QuestionRenderer
+          disabled={myResponses?.id}
+         
             key={q.id}
             question={q}
             value={answers[q.id]?.value}
@@ -132,7 +180,10 @@ export default function SurveyDetailPage() {
       </div>
 
       {/* Actions */}
-      <div className="flex justify-end">
+
+      {
+         !myResponses?.id &&
+ <div className="flex justify-end">
         <button
           onClick={handleSubmit}
           disabled={submitState.loading}
@@ -144,6 +195,8 @@ export default function SurveyDetailPage() {
           Submit Survey
         </button>
       </div>
+      }
+     
     </div>
   );
 }
@@ -151,9 +204,19 @@ export default function SurveyDetailPage() {
 /* ======================================================
    QUESTION RENDERER (ALL TYPES SUPPORTED)
 ====================================================== */
-function QuestionRenderer({ question, value, onChange, index }) {
+function QuestionRenderer({
+  question,
+  value,
+  onChange,
+  index,
+  disabled = false,
+}) {
   return (
-    <div className="space-y-2">
+    <div
+      className={`space-y-2 ${
+        disabled ? "opacity-70 cursor-not-allowed" : ""
+      }`}
+    >
       {/* Label */}
       <p className="font-medium">
         {index + 1}. {question.label}
@@ -174,10 +237,11 @@ function QuestionRenderer({ question, value, onChange, index }) {
         <input
           type="text"
           value={value || ""}
+          disabled={disabled}
           onChange={(e) =>
-            onChange(question, e.target.value)
+            !disabled && onChange(question, e.target.value)
           }
-          className="w-full border rounded-lg px-3 py-2 text-sm"
+          className="w-full border rounded-lg px-3 py-2 text-sm disabled:bg-gray-100"
         />
       )}
 
@@ -185,10 +249,11 @@ function QuestionRenderer({ question, value, onChange, index }) {
       {question.question_type === "textarea" && (
         <textarea
           value={value || ""}
+          disabled={disabled}
           onChange={(e) =>
-            onChange(question, e.target.value)
+            !disabled && onChange(question, e.target.value)
           }
-          className="w-full border rounded-lg px-3 py-2 text-sm"
+          className="w-full border rounded-lg px-3 py-2 text-sm disabled:bg-gray-100"
           rows={4}
         />
       )}
@@ -198,10 +263,11 @@ function QuestionRenderer({ question, value, onChange, index }) {
         <input
           type="number"
           value={value || ""}
+          disabled={disabled}
           onChange={(e) =>
-            onChange(question, e.target.value)
+            !disabled && onChange(question, e.target.value)
           }
-          className="w-full border rounded-lg px-3 py-2 text-sm"
+          className="w-full border rounded-lg px-3 py-2 text-sm disabled:bg-gray-100"
         />
       )}
 
@@ -210,14 +276,17 @@ function QuestionRenderer({ question, value, onChange, index }) {
         question.choices?.map((c) => (
           <label
             key={c.id}
-            className="flex items-center gap-2 text-sm"
+            className={`flex items-center gap-2 text-sm ${
+              disabled ? "cursor-not-allowed" : "cursor-pointer"
+            }`}
           >
             <input
               type="radio"
               name={question.id}
               checked={value === c.value}
+              disabled={disabled}
               onChange={() =>
-                onChange(question, c.value)
+                !disabled && onChange(question, c.value)
               }
             />
             {c.label}
@@ -226,16 +295,26 @@ function QuestionRenderer({ question, value, onChange, index }) {
 
       {/* CHECKBOX */}
       {question.question_type === "checkbox" &&
-        question.choices?.map((c) => (
+        question.choices.map((c) => (
           <label
             key={c.id}
-            className="flex items-center gap-2 text-sm"
+            className={`flex items-center gap-2 text-sm ${
+              disabled ? "cursor-not-allowed" : "cursor-pointer"
+            }`}
           >
             <input
               type="checkbox"
-              checked={value?.includes(c.value)}
+              disabled={disabled}
+              checked={
+                Array.isArray(value) &&
+                value.includes(c.value)
+              }
               onChange={(e) => {
-                const next = value ? [...value] : [];
+                if (disabled) return;
+
+                const next = Array.isArray(value)
+                  ? [...value]
+                  : [];
 
                 if (e.target.checked) {
                   next.push(c.value);

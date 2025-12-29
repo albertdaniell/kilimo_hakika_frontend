@@ -90,6 +90,11 @@ submitSurveyState: {
   error: null,
   success: false,
 },
+  mySurveyResponsesState: {
+    loading: false,
+    error: null,
+    data: null,
+  },
 };
 
 /**
@@ -448,6 +453,21 @@ export const getSurveyBySlug = createAsyncThunk(
 
 export const submitSurveyResponses = createAsyncThunk(
   "app/submitSurveyResponses",
+  async ({ slug, answers }, { rejectWithValue }) => {
+    try {
+      const url = `${process.env.NEXT_PUBLIC_SURVEY_SUBMIT_URL}${slug}/submit/`;
+      const res = await AxiosPostService(url, { answers }, false);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to submit survey"
+      );
+    }
+  }
+);
+
+export const submitSurveyResponsesOld = createAsyncThunk(
+  "app/submitSurveyResponses",
   async ({ survey_id, answers }, { rejectWithValue }) => {
     try {
       const url = process.env.NEXT_PUBLIC_SURVEY_SUBMIT_URL;
@@ -463,6 +483,25 @@ export const submitSurveyResponses = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.detail || "Failed to submit survey"
+      );
+    }
+  }
+);
+
+export const getMySurveyResponses = createAsyncThunk(
+  "app/getMySurveyResponses",
+  async ({ slug }, { rejectWithValue }) => {
+    try {
+      const url = `${process.env.NEXT_PUBLIC_SURVEY_URL}/${slug}/my-answers/`;
+      console.log({url})
+      console.log({slug})
+      // example: /api/surveys/baseline-survey/my-responses/
+
+      const res = await AxiosGetService(url, false);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to load survey responses"
       );
     }
   }
@@ -802,6 +841,23 @@ builder
   state.submitSurveyState.loading = false;
   state.submitSurveyState.error = action.payload;
 });
+
+builder
+  // ===============================
+  // GET MY SURVEY RESPONSES
+  // ===============================
+  .addCase(getMySurveyResponses.pending, (state) => {
+    state.mySurveyResponsesState.loading = true;
+    state.mySurveyResponsesState.error = null;
+  })
+  .addCase(getMySurveyResponses.fulfilled, (state, action) => {
+    state.mySurveyResponsesState.loading = false;
+    state.mySurveyResponsesState.data = action.payload;
+  })
+  .addCase(getMySurveyResponses.rejected, (state, action) => {
+    state.mySurveyResponsesState.loading = false;
+    state.mySurveyResponsesState.error = action.payload;
+  });
   },
 });
 
