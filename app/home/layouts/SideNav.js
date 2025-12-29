@@ -10,7 +10,7 @@ const navItems = [
   { name: "Profile", link: "/home/profile" },
   { name: "Tracks", link: "/home/tracks" },
   { name: "Meeting", link: "/home/meeting" },
-  { name: "Surveys", link: "/home/surveys" },
+  { name: "Surveys", link: "/home/surveys/baseline" },
   { name: "Certificates", link: "/home/certificates" },
   { name: "Learning Materials", link: "/home/learning-materials" },
   { name: "Support", link: "/home/support" },

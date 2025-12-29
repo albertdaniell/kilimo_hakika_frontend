@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  getMyBaselineSurvey,
   getMyEnrollment,
   getMyLearningProgress,
   registerForMeeting,
@@ -9,7 +10,7 @@ import {
 import { FormatDate } from "../../constants/utils";
 import AILiteracyOutcome from "./pagecomponents/AILiteracyOutcome";
 import Link from "next/link";
-import { Loader2, CheckCircle } from "lucide-react";
+import { Loader2, CheckCircle, AlertTriangle } from "lucide-react";
 
 export default function page() {
   const dispatch = useDispatch();
@@ -21,11 +22,20 @@ export default function page() {
   const appData = useSelector((state) => state?.appData);
 
   const { loginState } = authData;
-  const { myEnrolmentState, learningProgressState, registerMeetingState } =
-    appData;
+  const {
+    myEnrolmentState,
+    learningProgressState,
+    registerMeetingState,
+    myBaselineSurveyState, // ✅ ADDED
+  } = appData;
 
   const myEnrolmentStateData = myEnrolmentState?.data[0] || null;
   const learningProgressStateData = learningProgressState?.data[0] || null;
+
+  /* ===========================
+     BASELINE STATUS
+  =========================== */
+  const baselineCompleted = !!myBaselineSurveyState?.data;
 
   /* ===========================
      USER INFO
@@ -49,6 +59,7 @@ export default function page() {
   useEffect(() => {
     dispatch(getMyEnrollment());
     dispatch(getMyLearningProgress());
+    // dispatch(getMyBaselineSurvey())
   }, [dispatch]);
 
   /* ===========================
@@ -76,7 +87,7 @@ export default function page() {
     )
       .unwrap()
       .then((res) => {
-    dispatch(getMyEnrollment());
+        dispatch(getMyEnrollment());
 
         if (res?.detail) {
           set_registerMeetingSuccess({
@@ -129,10 +140,49 @@ export default function page() {
         </button>
       </div>
 
+      {/* ================= BASELINE SURVEY STATUS CARD ================= */}
+      <div
+        className={`rounded-xl p-5 border flex items-center justify-between ${
+          baselineCompleted
+            ? "bg-green-50 border-green-200"
+            : "bg-yellow-50 border-yellow-200"
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          {baselineCompleted ? (
+            <CheckCircle className="w-6 h-6 text-green-600" />
+          ) : (
+            <AlertTriangle className="w-6 h-6 text-yellow-600" />
+          )}
+
+          <div>
+            <p className="font-medium">
+              Baseline Survey
+            </p>
+            <p className="text-sm text-gray-600">
+              {baselineCompleted
+                ? "You have completed the baseline survey"
+                : "You have not completed the baseline survey"}
+            </p>
+          </div>
+        </div>
+
+        {!baselineCompleted && (
+          <Link
+            href="/survey/baseline"
+            className="bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-yellow-700"
+          >
+            Complete Survey
+          </Link>
+        )}
+      </div>
+
       {/* ================= AI LITERACY ================= */}
       <AILiteracyOutcome
         learningProgressStateData={learningProgressStateData}
       />
+
+      {/* ================= TRACK OVERVIEW ================= */}
 
       {/* ================= TRACK OVERVIEW ================= */}
       <div className="bg-white rounded-xl shadow-sm p-6">
@@ -207,7 +257,7 @@ export default function page() {
             ) : (
               <Link
                 target="_blank"
-                href={myEnrolmentStateData.track.meeting.json?.join_url}
+                href={myEnrolmentStateData.track.meeting.json?.start_url}
                 className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-600"
               >
                 Join Meeting

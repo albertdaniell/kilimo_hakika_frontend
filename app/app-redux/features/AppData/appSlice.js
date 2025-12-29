@@ -65,6 +65,16 @@ const initialState = {
     error: null,
     data: [],
   },
+  baselineSurveyState: {
+    loading: false,
+    data: null,
+    error: null,
+  },
+   myBaselineSurveyState: {
+    loading: false,
+    error: null,
+    data: null,
+  },
 };
 
 /**
@@ -305,6 +315,24 @@ export const deleteTrackMeeting = createAsyncThunk(
   }
 );
 
+export const getMyBaselineSurvey = createAsyncThunk(
+  "app/getMyBaselineSurvey",
+  async (_, { rejectWithValue }) => {
+    try {
+      const url =
+        process.env.NEXT_PUBLIC_BASELINE_MY_RESPONSE_URL;
+      // example: /api/surveys/baseline/my-response/
+
+      const res = await AxiosGetService(url, false);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data || "Failed to fetch baseline survey response"
+      );
+    }
+  }
+);
+
 export const registerForMeeting = createAsyncThunk(
   "app/registerForMeeting",
   async ({ meeting_id }, { rejectWithValue }) => {
@@ -318,6 +346,30 @@ export const registerForMeeting = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.detail || "Failed to register for meeting"
+      );
+    }
+  }
+);
+
+
+// app-redux/features/AppData/appSlice.js
+
+export const submitBaselineSurvey = createAsyncThunk(
+  "app/submitBaselineSurvey",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const url =
+        process.env.NEXT_PUBLIC_BASELINE_SURVEY_SUBMIT_URL;
+      // example: /api/surveys/baseline/submit/
+
+      const res = await AxiosPostService(url, payload, false);
+
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data ||
+          err.response?.data?.detail ||
+          "Failed to submit baseline survey"
       );
     }
   }
@@ -350,6 +402,13 @@ const appSlice = createSlice({
     ToggleIsDataHub: (state, action) => {
       state.isDataHub = action.payload;
     },
+    resetBaselineSurveyState: (state) => {
+    state.baselineSurveyState = {
+      loading: false,
+      data: null,
+      error: null,
+    };
+  },
   },
   extraReducers: (builder) => {
     builder
@@ -580,8 +639,43 @@ const appSlice = createSlice({
     state.myMeetingsState.loading = false;
     state.myMeetingsState.error = action.payload;
   });
+
+  builder
+  // ===============================
+  // BASELINE SURVEY SUBMIT
+  // ===============================
+  .addCase(submitBaselineSurvey.pending, (state) => {
+    state.baselineSurveyState.loading = true;
+    state.baselineSurveyState.error = null;
+    state.baselineSurveyState.data = null;
+  })
+  .addCase(submitBaselineSurvey.fulfilled, (state, action) => {
+    state.baselineSurveyState.loading = false;
+    state.baselineSurveyState.data = action.payload;
+  })
+  .addCase(submitBaselineSurvey.rejected, (state, action) => {
+    state.baselineSurveyState.loading = false;
+    state.baselineSurveyState.error = action.payload;
+  });
+
+  /* =========================================
+   GET MY BASELINE SURVEY
+========================================= */
+builder
+  .addCase(getMyBaselineSurvey.pending, (state) => {
+    state.myBaselineSurveyState.loading = true;
+    state.myBaselineSurveyState.error = null;
+  })
+  .addCase(getMyBaselineSurvey.fulfilled, (state, action) => {
+    state.myBaselineSurveyState.loading = false;
+    state.myBaselineSurveyState.data = action.payload;
+  })
+  .addCase(getMyBaselineSurvey.rejected, (state, action) => {
+    state.myBaselineSurveyState.loading = false;
+    state.myBaselineSurveyState.error = action.payload;
+  });
   },
 });
 
-export const { ToggleIsDataHub } = appSlice.actions;
+export const { ToggleIsDataHub,resetBaselineSurveyState } = appSlice.actions;
 export default appSlice.reducer;
