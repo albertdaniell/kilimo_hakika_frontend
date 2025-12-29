@@ -219,18 +219,23 @@ export default function page() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <Info
+            valueClassName="text-purple-500"
             label="Track Name"
             value={myEnrolmentStateData?.track?.name || "-"}
           />
           <Info
+           valueClassName="text-orange-500"
             label="Cohort"
             value={myEnrolmentStateData?.cohort?.name || "-"}
           />
           <Info
+           valueClassName="text-blue-500"
             label="Enrolled Trainees"
             value={myEnrolmentStateData?.track?.enrolled_trainees || "-"}
           />
-          <Info label="Status" value={myEnrolmentStateData ? "Active" : "-"} />
+          <Info 
+           valueClassName="text-green-500"
+          label="Status" value={myEnrolmentStateData ? "Active" : "-"} />
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6">
@@ -410,11 +415,15 @@ export default function page() {
 /* ===========================
    INFO COMPONENT
 =========================== */
-function Info({ label, value }) {
+function Info({ label, value, valueClassName = "" }) {
   return (
     <div>
-      <p className="text-gray-500 text-xs uppercase tracking-wide">{label}</p>
-      <p className="font-medium text-sm">{value}</p>
+      <p
+        className={`text-gray-500 text-xs uppercase tracking-wide`}
+      >
+        {label}
+      </p>
+      <p className={`font-medium text-sm ${valueClassName}`}>{value}</p>
     </div>
   );
 }
