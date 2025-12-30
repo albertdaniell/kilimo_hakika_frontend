@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { Users, Layers, CalendarDays, BarChart3 } from "lucide-react";
+import {
+  Users,
+  Layers,
+  CalendarDays,
+  BarChart3,
+  ClipboardList,
+} from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAdminDashboardStats } from "@/app/app-redux/features/AppData/appSlice";
 import {
@@ -47,7 +53,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Top Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
           icon={<Users className="w-5 h-5" />}
           label={`Total Enrolled Trainees`}
@@ -62,16 +68,39 @@ export default function AdminDashboard() {
           note="Across multiple sectors"
           color="blue"
         />
+
         <StatCard
           icon={<CalendarDays className="w-5 h-5" />}
           label="Active Cohorts"
           value={`${data.active_cohorts}`}
-          
           note={`Currently running of ${data?.all_cohorts} cohorts`}
-
-        //   value={data.active_cohorts}
-        //   note="Currently running"
+          //   value={data.active_cohorts}
+          //   note="Currently running"
           color="indigo"
+        />
+        <StatCard
+          icon={<ClipboardList className="w-5 h-5" />}
+          label="Baseline Surveys"
+          value={data.total_survey_responses}
+          note="Baseline surveys submitted"
+          color="blue"
+           body={<>
+                     <p className="text-2xl font-bold text-gray-900">{data.total_survey_responses}</p>
+
+                <div className="flex flex-row gap-2 justify-between divide-amber-900">
+                <div>
+                    <p className="text-xs text-slate-500 mt-1">
+                         {data.total_survey_responses_baseline}  Baseline survey
+                    </p>
+      {/* <p className="text-xs text-gray-400 mt-1">{note}</p> */}
+                </div>
+                <div>
+                     <p className="text-xs text-slate-500 mt-1">
+                      {data.total_survey_responses_endline}  Endline survey
+                    </p>
+                </div>
+                </div>
+          </>}
         />
         <StatCard
           icon={<BarChart3 className="w-5 h-5" />}
@@ -79,6 +108,7 @@ export default function AdminDashboard() {
           value={`${data.ai_literacy_avg_progress}%`}
           note="AI literacy progress"
           color="emerald"
+         
         />
       </div>
 
@@ -99,14 +129,12 @@ export default function AdminDashboard() {
           ))}
         </div>
       </div>
-<EnrollmentPerDayChart data={data.enrollments_per_day} />
+      <EnrollmentPerDayChart data={data.enrollments_per_day} />
 
       {/* Engagement & Meetings (still static placeholders) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold mb-4">
-            Trainee Engagement
-          </h2>
+          <h2 className="text-lg font-semibold mb-4">Trainee Engagement</h2>
 
           <ul className="space-y-3 text-sm">
             <li className="flex justify-between">
@@ -125,9 +153,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold mb-4">
-            Upcoming Meetings
-          </h2>
+          <h2 className="text-lg font-semibold mb-4">Upcoming Meetings</h2>
 
           <p className="text-sm text-gray-500">
             No upcoming meetings configured
@@ -137,27 +163,22 @@ export default function AdminDashboard() {
 
       {/* Quick Actions */}
       <div className="bg-green-600 rounded-2xl p-6 text-white">
-        <h2 className="text-xl font-semibold mb-2">
-          Quick Admin Actions
-        </h2>
+        <h2 className="text-xl font-semibold mb-2">Quick Admin Actions</h2>
         <p className="text-sm text-green-100 mb-4">
           Manage cohorts, tracks, and monitor programme performance
         </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[
-            "Create Cohort",
-            "Add Track",
-            "View Reports",
-            "Manage Users",
-          ].map((item) => (
-            <button
-              key={item}
-              className="bg-white/10 hover:bg-white/20 rounded-xl py-3 text-sm font-medium transition"
-            >
-              {item}
-            </button>
-          ))}
+          {["Create Cohort", "Add Track", "View Reports", "Manage Users"].map(
+            (item) => (
+              <button
+                key={item}
+                className="bg-white/10 hover:bg-white/20 rounded-xl py-3 text-sm font-medium transition"
+              >
+                {item}
+              </button>
+            )
+          )}
         </div>
       </div>
     </div>
@@ -168,7 +189,7 @@ export default function AdminDashboard() {
 /* Components */
 /* ========================= */
 
-function StatCard({ icon, label, value, note, color }) {
+function StatCard({ icon, label, value, note, color,body }) {
   const colorMap = {
     green: "bg-green-100 text-green-700",
     blue: "bg-blue-100 text-blue-700",
@@ -186,8 +207,14 @@ function StatCard({ icon, label, value, note, color }) {
         </div>
         <p className="text-sm text-gray-500">{label}</p>
       </div>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
+      {
+        body ? body :
+        <>
+         <p className="text-2xl font-bold text-gray-900">{value}</p>
       <p className="text-xs text-gray-400 mt-1">{note}</p>
+        </>
+      }
+     
     </div>
   );
 }
@@ -211,31 +238,22 @@ function TrackRow({ name, value }) {
   );
 }
 
-
-
 function EnrollmentPerDayChart({ data = [] }) {
   if (!data.length) {
     return (
-      <p className="text-sm text-gray-500">
-        No enrollment data available
-      </p>
+      <p className="text-sm text-gray-500">No enrollment data available</p>
     );
   }
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6">
-      <h2 className="text-lg font-semibold mb-4">
-        Enrolments Per Day
-      </h2>
+      <h2 className="text-lg font-semibold mb-4">Enrolments Per Day</h2>
 
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-            <XAxis
-              dataKey="date"
-              tick={{ fontSize: 12 }}
-            />
+            <XAxis dataKey="date" tick={{ fontSize: 12 }} />
             <YAxis allowDecimals={false} />
             <Tooltip />
             <Line

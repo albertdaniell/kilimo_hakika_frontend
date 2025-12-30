@@ -17,7 +17,7 @@ export default function SurveysPage() {
   }, [dispatch]);
 
   return (
-    <div className="max-w-5xl space-y-6">
+    <div className=" space-y-6">
       {/* ================= HEADER ================= */}
       <div>
         <h1 className="text-2xl font-semibold">Surveys</h1>

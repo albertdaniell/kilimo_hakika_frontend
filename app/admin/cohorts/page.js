@@ -61,7 +61,7 @@ export default function Page() {
       {/* Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
+          <thead className="bg-gray-50 border-b border-slate-300">
             <tr>
               <th className="text-left px-4 py-3">Name</th>
               <th className="text-left px-4 py-3">Start Date</th>
@@ -73,7 +73,7 @@ export default function Page() {
 
           <tbody>
             {cohorts?.map((cohort) => (
-              <tr key={cohort.id} className="border-b last:border-b-0">
+              <tr key={cohort.id} className="border-b  border-slate-300 last:border-b-0">
                 <td className="px-4 py-3 font-medium">{cohort.name}</td>
                 <td className="px-4 py-3">{cohort.start_date}</td>
                 <td className="px-4 py-3">{cohort.end_date}</td>

@@ -60,7 +60,7 @@ export default function page() {
 
   useEffect(()=>{
     let baseline = myTrackSurveysStateData?.find((d)=>{
-      return d.slug === "baseline-survey"
+      return d.slug.includes("baseline-survey")
     })
     set_baseLineSurvey(baseline)
 
@@ -224,7 +224,7 @@ export default function page() {
             value={myEnrolmentStateData?.track?.name || "-"}
           />
           <Info
-           valueClassName="text-orange-500"
+           valueClassName="text-yellow-500"
             label="Cohort"
             value={myEnrolmentStateData?.cohort?.name || "-"}
           />

@@ -224,7 +224,7 @@ function MeetingDetails({ meeting }) {
 
 function MeetingAttendanceSection({ attendance }) {
   return (
-    <div className="border-t pt-4 space-y-3">
+    <div className="border-t border-slate-300 pt-4 space-y-3">
       <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
         <Users className="w-4 h-4" />
         Your Attendance

@@ -95,6 +95,21 @@ submitSurveyState: {
     error: null,
     data: null,
   },
+  myAdminSurveyResponsesState: {
+  loading: false,
+  error: null,
+  data: [],
+},
+surveyInsightsState: {
+    data: null,
+    loading: false,
+    error: null,
+  },
+  allSurveysState: {
+    data: [],
+    loading: false,
+    error: null,
+  },
 };
 
 /**
@@ -507,6 +522,77 @@ export const getMySurveyResponses = createAsyncThunk(
   }
 );
 
+export const getAdminSurveyResponses = createAsyncThunk(
+  "app/getAdminSurveyResponses",
+  async (
+    { page = 1, email = "", cohort_id = "", survey_type = "" },
+    { rejectWithValue }
+  ) => {
+    try {
+      const url = process.env.NEXT_PUBLIC_ADMIN_SURVEY_RESPONSES_URL;
+
+      const params = new URLSearchParams();
+      params.append("page", page);
+
+      if (email) params.append("user_email", email);
+      if (cohort_id) params.append("cohort_id", cohort_id);
+      if (survey_type) params.append("survey_slug", survey_type);
+
+      const res = await AxiosGetService(
+        `${url}?${params.toString()}`,
+        
+      );
+
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to fetch survey responses"
+      );
+    }
+  }
+);
+
+// app-redux/features/AppData/appSlice.js
+
+export const getSurveyInsights = createAsyncThunk(
+  "app/getSurveyInsights",
+  async ({ slug }, { rejectWithValue }) => {
+    try {
+// alert(0)
+      const url = `${process.env.NEXT_PUBLIC_ADMIN_SURVEY_INSIGHTS_URL}/${slug}/insights/`;
+      console.log({url})
+
+      const res = await AxiosGetService(url);
+      return res.data;
+    } catch (err) {
+      console.log({err})
+
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to load survey insights"
+      );
+    }
+  }
+);
+
+/* =====================================================
+   GET ALL SURVEYS (ADMIN)
+===================================================== */
+export const getAllSurveys = createAsyncThunk(
+  "app/getAllSurveys",
+  async (_, { rejectWithValue }) => {
+    try {
+      const url = `${process.env.NEXT_PUBLIC_ADMIN_SURVEY_INSIGHTS_URL}/`;
+
+      const res = await AxiosGetService(url);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to fetch surveys"
+      );
+    }
+  }
+);
+
 const appSlice = createSlice({
   name: "app",
   initialState,
@@ -858,6 +944,54 @@ builder
     state.mySurveyResponsesState.loading = false;
     state.mySurveyResponsesState.error = action.payload;
   });
+  builder
+  /* ================= ADMIN SURVEY RESPONSES ================= */
+.addCase(getAdminSurveyResponses.pending, (state) => {
+  state.myAdminSurveyResponsesState.loading = true;
+  state.myAdminSurveyResponsesState.error = null;
+})
+.addCase(getAdminSurveyResponses.fulfilled, (state, action) => {
+  state.myAdminSurveyResponsesState.loading = false;
+  state.myAdminSurveyResponsesState.data = action.payload.results || [];
+  state.myAdminSurveyResponsesState.count = action.payload.count;
+  state.myAdminSurveyResponsesState.next = action.payload.next;
+  state.myAdminSurveyResponsesState.previous = action.payload.previous;
+})
+.addCase(getAdminSurveyResponses.rejected, (state, action) => {
+  state.myAdminSurveyResponsesState.loading = false;
+  state.myAdminSurveyResponsesState.error = action.payload;
+});
+
+builder
+  .addCase(getSurveyInsights.pending, (state) => {
+    state.surveyInsightsState.loading = true;
+    state.surveyInsightsState.error = null;
+  })
+  .addCase(getSurveyInsights.fulfilled, (state, action) => {
+    state.surveyInsightsState.loading = false;
+    state.surveyInsightsState.data = action.payload;
+  })
+  .addCase(getSurveyInsights.rejected, (state, action) => {
+    state.surveyInsightsState.loading = false;
+    state.surveyInsightsState.error = action.payload;
+  });
+  builder
+
+    /* ===============================
+       GET ALL SURVEYS
+    =============================== */
+    .addCase(getAllSurveys.pending, (state) => {
+      state.allSurveysState.loading = true;
+      state.allSurveysState.error = null;
+    })
+    .addCase(getAllSurveys.fulfilled, (state, action) => {
+      state.allSurveysState.loading = false;
+      state.allSurveysState.data = action.payload;
+    })
+    .addCase(getAllSurveys.rejected, (state, action) => {
+      state.allSurveysState.loading = false;
+      state.allSurveysState.error = action.payload;
+    });
   },
 });
 

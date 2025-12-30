@@ -5,7 +5,7 @@ export default function AppModal({
   isOpen = false,
   setIsOpen,
   closeText = "Close",
-  closeBtnClass = "px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition mt-3",
+  closeBtnClass = "px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-200 transition mt-3",
   setIsClose,
   title = null,
   body,
@@ -23,7 +23,9 @@ export default function AppModal({
       {isOpen && (
         <div className={className1}>
           {/* Overlay */}
-          <div className={className} onClick={() => setIsClose()}></div>
+          <div className={className} 
+          // onClick={() => setIsClose()}
+          ></div>
 
           {/* Modal content */}
           <div className={className2}>
