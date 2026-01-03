@@ -13,17 +13,23 @@ export default function TopNav() {
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-  const handleLogout = () => {
-    dispatch(logout())
-    // ✅ Clear local storage
-    localStorage.clear();
+const handleLogout = () => {
+  dispatch(logout());
 
-    // ✅ Close dropdown
-    setIsDropdownOpen(false);
+  // ✅ Capture current page before logout
+  const nextPage = window.location.pathname;
 
-    // ✅ Redirect to login
-    router.push("/auth/login");
-  };
+  // ✅ Clear local storage
+  localStorage.clear();
+
+  // ✅ Close dropdown
+  setIsDropdownOpen(false);
+
+  // ✅ Redirect to login with nextPage
+  router.push(
+    `/auth/login?nextPage=${encodeURIComponent(nextPage)}`
+  );
+};
 
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-b-slate-200 z-50">

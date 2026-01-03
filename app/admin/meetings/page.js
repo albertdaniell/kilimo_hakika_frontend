@@ -49,7 +49,12 @@ export default function AdminMeetingsPage() {
 
   const [track, setTrack] = useState("");
   const [startTime, setStartTime] = useState("");
-  const [duration, setDuration] = useState("");
+  const [duration, setDuration] = useState(1);
+
+  const [createMeetingError, setcreateMeetingError] = useState(null);
+  const [createMeetingSuccess, setcreateMeetingSuccess] = useState(null);
+
+
 
   /* ================= EFFECTS ================= */
   useEffect(() => {
@@ -74,13 +79,17 @@ export default function AdminMeetingsPage() {
         start_time: startTime,
         duration_hours: duration,
       })
-    ).then(() => {
-      setShowCreate(false);
+    ).unwrap().then(() => {
+        setcreateMeetingSuccess("Meeting has been created successfully!")
+    //   setShowCreate(false);
       setTrack("");
       setStartTime("");
       setDuration("");
       dispatch(getTrackMeetings());
-    });
+    }).catch((err)=>{
+        console.log(err)
+        setcreateMeetingError(err)
+    })
   };
 
   /* ================= DELETE ================= */
@@ -111,7 +120,11 @@ export default function AdminMeetingsPage() {
         <h1 className="text-xl font-semibold">Track Meetings</h1>
 
         <button
-          onClick={() => setShowCreate(true)}
+          onClick={() => {
+            setShowCreate(true)
+            setcreateMeetingError(null)
+            setcreateMeetingSuccess(null)
+          }}
           className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg text-sm"
         >
           <Plus className="w-4 h-4" />
@@ -231,6 +244,42 @@ export default function AdminMeetingsPage() {
         Create Track Meeting
       </h2>
 
+      {createMeetingSuccess && (
+  <div className="flex items-start gap-2 bg-green-50 border border-green-200 text-green-700 rounded-lg p-4 text-sm">
+    <svg
+      className="w-4 h-4 mt-0.5 text-green-600"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+    >
+      <path
+        fillRule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.172 7.707 8.879a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+        clipRule="evenodd"
+      />
+    </svg>
+
+    <span>{createMeetingSuccess}</span>
+  </div>
+)}
+
+      {createMeetingError && (
+  <div className="flex items-start gap-2 bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+    <svg
+      className="w-4 h-4 mt-0.5 text-red-600"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+    >
+      <path
+        fillRule="evenodd"
+        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-4a1 1 0 00-1 1v3a1 1 0 102 0V7a1 1 0 00-1-1zm0 7a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"
+        clipRule="evenodd"
+      />
+    </svg>
+
+    <span>{createMeetingError}</span>
+  </div>
+)}
+
       {/* Track */}
       <div className="space-y-1">
         <label className="text-sm font-medium text-gray-700">
@@ -275,16 +324,16 @@ export default function AdminMeetingsPage() {
         </label>
         <input
           type="number"
-          min="0.5"
-          step="0.5"
-          placeholder="e.g. 1.5"
+          min="1"
+        //   step="0.5"
+          placeholder="e.g. 1"
           value={duration}
           onChange={(e) => setDuration(e.target.value)}
           required
           className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-400"
         />
         <p className="text-xs text-gray-400">
-          Supports decimals (e.g. 1.5 = 1 hour 30 minutes)
+          Supports hours in numbers (e.g. 1, 2, 3)
         </p>
       </div>
 
@@ -295,7 +344,7 @@ export default function AdminMeetingsPage() {
           onClick={() => setShowCreate(false)}
           className="px-4 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200"
         >
-          Cancel
+         {createMeetingSuccess || createMeetingError ? "Close":"Cancel"}
         </button>
 
         <button

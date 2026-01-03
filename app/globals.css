@@ -27,3 +27,12 @@ body {
   font-family: var(--font-poppins) !important;
 
 }
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.cursor::after {
+  content: "▋";
+  animation: blink 1s infinite;
+}

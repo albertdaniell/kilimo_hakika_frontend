@@ -2,12 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
 import { loginUser } from "../../app-redux/features/AppData/authSlice";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Login() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const nextPage = searchParams.get("nextPage");
+
 
   const { loading, error, data } = useSelector(
     (state) => state.authData.loginState
@@ -31,15 +35,51 @@ export default function Login() {
 
   // ✅ Redirect after successful login
   // ✅ Redirect after successful login based on role
-useEffect(() => {
-  if (data?.access && data?.user?.role) {
-    if (data.user.role === "TRAINEE") {
-      router.push("/home");
-    } else if (data.user.role === "ADMIN") {
-      router.push("/admin");
+  useEffect(() => {
+  if (!data?.access || !data?.user) return;
+
+  // ✅ Save user
+  localStorage.setItem("user", JSON.stringify(data.user));
+
+  const params = new URLSearchParams(window.location.search);
+  const nextPage = params.get("nextPage");
+
+  const role = data.user.role;
+
+  // ✅ Role-aware nextPage handling
+  if (nextPage) {
+    const isHomeRoute = nextPage.startsWith("/home");
+    const isAdminRoute = nextPage.startsWith("/admin");
+
+    // TRAINEE → only /home
+    if (role === "TRAINEE" && isHomeRoute) {
+      router.replace(nextPage);
+      return;
+    }
+
+    // ADMIN → /admin OR /home (admins may access both if you allow)
+    if (role === "ADMIN" && (isAdminRoute)) {
+      router.replace(nextPage);
+      return;
     }
   }
+
+  // ✅ Fallback (safe default)
+  if (role === "ADMIN") {
+    router.replace("/admin");
+  } else {
+    router.replace("/home");
+  }
 }, [data, router]);
+// useEffect(() => {
+//   if (data?.access && data?.user?.role) {
+//     if (data.user.role === "TRAINEE") {
+//       router.push("/home");
+//     } else if (data.user.role === "ADMIN") {
+//       router.push("/admin");
+//     }
+//   }
+// }, [data, router]);
 
   return (
     <div className="w-full max-w-md">

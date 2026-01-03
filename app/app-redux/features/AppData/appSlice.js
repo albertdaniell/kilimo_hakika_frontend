@@ -110,6 +110,11 @@ surveyInsightsState: {
     loading: false,
     error: null,
   },
+   traineesState: {
+    data: [],
+    loading: false,
+    error: null,
+  },
 };
 
 /**
@@ -593,6 +598,25 @@ export const getAllSurveys = createAsyncThunk(
   }
 );
 
+
+
+export const getAllTrainees = createAsyncThunk(
+  "app/getAllTrainees",
+  async ({ page = 1 } = {}, { rejectWithValue }) => {
+    try {
+      const url = `${process.env.NEXT_PUBLIC_ADMIN_TRAINESS_URL}?page=${page}`;
+      // example: /api/admin/trainees/?page=1
+
+      const res = await AxiosGetService(url);
+      return res.data; // { count, next, previous, results }
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to fetch trainees"
+      );
+    }
+  }
+);
+
 const appSlice = createSlice({
   name: "app",
   initialState,
@@ -992,6 +1016,22 @@ builder
       state.allSurveysState.loading = false;
       state.allSurveysState.error = action.payload;
     });
+
+    builder
+      // ================= TRAINEES =================
+      .addCase(getAllTrainees.pending, (state) => {
+        state.traineesState.loading = true;
+        state.traineesState.error = null;
+      })
+      .addCase(getAllTrainees.fulfilled, (state, action) => {
+        state.traineesState.loading = false;
+        state.traineesState.data = action.payload;
+      })
+      .addCase(getAllTrainees.rejected, (state, action) => {
+        state.traineesState.loading = false;
+        state.traineesState.error = action.payload;
+      });
+  
   },
 });
 

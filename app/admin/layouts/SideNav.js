@@ -76,7 +76,7 @@ export default function SideNav({ collapsed, setCollapsed }) {
       {/* SIDEBAR */}
       <aside
   className={`
-    fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white border-r
+    fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white border-r border-slate-300
     transition-all duration-300 z-40
     overflow-y-auto
     ${collapsed ? "w-20" : "w-64"}
