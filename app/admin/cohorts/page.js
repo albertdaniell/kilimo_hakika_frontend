@@ -59,7 +59,7 @@ export default function Page() {
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm overflow-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-slate-300">
             <tr>
@@ -161,7 +161,7 @@ function CohortForm({ cohort, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 backdrop-blur-sm bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-4">
         <h2 className="text-lg font-semibold">
           {isEdit ? "Edit Cohort" : "Add Cohort"}

@@ -47,7 +47,9 @@ export default function TraineesPage() {
 
       {/* ================= TABLE ================= */}
       {!loading && (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <>
+        
+        <div className="bg-white rounded-xl shadow-sm overflow-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-slate-300">
               <tr>
@@ -95,7 +97,9 @@ export default function TraineesPage() {
             </tbody>
           </table>
 
-          {/* ================= PAGINATION ================= */}
+          
+        </div>
+{/* ================= PAGINATION ================= */}
           <div className="flex items-center justify-between px-4 py-3 border-t border-slate-300 text-sm">
             <p className="text-gray-500">
               Total trainees: <strong>{total}</strong>
@@ -121,8 +125,10 @@ export default function TraineesPage() {
               </button>
             </div>
           </div>
-        </div>
+</>
       )}
+
+      
 
       {/* ================= SIDE MODAL ================= */}
       {selectedTrainee && (

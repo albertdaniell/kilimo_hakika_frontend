@@ -60,7 +60,7 @@ const initialState = {
     loading: false,
     error: null,
   },
-   myMeetingsState: {
+  myMeetingsState: {
     loading: false,
     error: null,
     data: [],
@@ -70,37 +70,37 @@ const initialState = {
     data: null,
     error: null,
   },
-   myBaselineSurveyState: {
+  myBaselineSurveyState: {
     loading: false,
     error: null,
     data: null,
   },
   myTrackSurveysState: {
-  loading: false,
-  error: null,
-  data: [],
-},
-surveyBySlugState: {
-  loading: false,
-  error: null,
-  data: null,
-},
-submitSurveyState: {
-  loading: false,
-  error: null,
-  success: false,
-},
+    loading: false,
+    error: null,
+    data: [],
+  },
+  surveyBySlugState: {
+    loading: false,
+    error: null,
+    data: null,
+  },
+  submitSurveyState: {
+    loading: false,
+    error: null,
+    success: false,
+  },
   mySurveyResponsesState: {
     loading: false,
     error: null,
     data: null,
   },
   myAdminSurveyResponsesState: {
-  loading: false,
-  error: null,
-  data: [],
-},
-surveyInsightsState: {
+    loading: false,
+    error: null,
+    data: [],
+  },
+  surveyInsightsState: {
     data: null,
     loading: false,
     error: null,
@@ -110,10 +110,25 @@ surveyInsightsState: {
     loading: false,
     error: null,
   },
-   traineesState: {
+  traineesState: {
     data: [],
     loading: false,
     error: null,
+  },
+  certificatesState: {
+    data: [],
+    loading: false,
+    error: null,
+  },
+  adminCertificatesState: {
+    data: [],
+    loading: false,
+    error: null,
+    pagination: {
+      count: 0,
+      next: null,
+      previous: null,
+    },
   },
 };
 
@@ -355,7 +370,6 @@ export const deleteTrackMeeting = createAsyncThunk(
   }
 );
 
-
 export const registerForMeeting = createAsyncThunk(
   "app/registerForMeeting",
   async ({ meeting_id }, { rejectWithValue }) => {
@@ -378,8 +392,7 @@ export const getMyBaselineSurvey = createAsyncThunk(
   "app/getMyBaselineSurvey",
   async (_, { rejectWithValue }) => {
     try {
-      const url =
-        process.env.NEXT_PUBLIC_BASELINE_MY_RESPONSE_URL;
+      const url = process.env.NEXT_PUBLIC_BASELINE_MY_RESPONSE_URL;
       // example: /api/surveys/baseline/my-response/
 
       const res = await AxiosGetService(url, false);
@@ -392,16 +405,13 @@ export const getMyBaselineSurvey = createAsyncThunk(
   }
 );
 
-
-
 // app-redux/features/AppData/appSlice.js
 
 export const submitBaselineSurvey = createAsyncThunk(
   "app/submitBaselineSurvey",
   async (payload, { rejectWithValue }) => {
     try {
-      const url =
-        process.env.NEXT_PUBLIC_BASELINE_SURVEY_SUBMIT_URL;
+      const url = process.env.NEXT_PUBLIC_BASELINE_SURVEY_SUBMIT_URL;
       // example: /api/surveys/baseline/submit/
 
       const res = await AxiosPostService(url, payload, false);
@@ -424,7 +434,6 @@ export const getMyMeetings = createAsyncThunk(
   "appData/getMyMeetings",
   async (_, { rejectWithValue }) => {
     try {
-      
       const url = process.env.NEXT_PUBLIC_TRACK_MEETINGS_ME_URL;
       const res = await AxiosGetService(url);
 
@@ -493,11 +502,7 @@ export const submitSurveyResponsesOld = createAsyncThunk(
       const url = process.env.NEXT_PUBLIC_SURVEY_SUBMIT_URL;
       // POST /api/surveys/submit/
 
-      const res = await AxiosPostService(
-        url,
-        { survey_id, answers },
-        true
-      );
+      const res = await AxiosPostService(url, { survey_id, answers }, true);
 
       return res.data;
     } catch (err) {
@@ -513,8 +518,8 @@ export const getMySurveyResponses = createAsyncThunk(
   async ({ slug }, { rejectWithValue }) => {
     try {
       const url = `${process.env.NEXT_PUBLIC_SURVEY_URL}/${slug}/my-answers/`;
-      console.log({url})
-      console.log({slug})
+      console.log({ url });
+      console.log({ slug });
       // example: /api/surveys/baseline-survey/my-responses/
 
       const res = await AxiosGetService(url, false);
@@ -543,10 +548,7 @@ export const getAdminSurveyResponses = createAsyncThunk(
       if (cohort_id) params.append("cohort_id", cohort_id);
       if (survey_type) params.append("survey_slug", survey_type);
 
-      const res = await AxiosGetService(
-        `${url}?${params.toString()}`,
-        
-      );
+      const res = await AxiosGetService(`${url}?${params.toString()}`);
 
       return res.data;
     } catch (err) {
@@ -563,14 +565,14 @@ export const getSurveyInsights = createAsyncThunk(
   "app/getSurveyInsights",
   async ({ slug }, { rejectWithValue }) => {
     try {
-// alert(0)
+      // alert(0)
       const url = `${process.env.NEXT_PUBLIC_ADMIN_SURVEY_INSIGHTS_URL}/${slug}/insights/`;
-      console.log({url})
+      console.log({ url });
 
       const res = await AxiosGetService(url);
       return res.data;
     } catch (err) {
-      console.log({err})
+      console.log({ err });
 
       return rejectWithValue(
         err.response?.data?.detail || "Failed to load survey insights"
@@ -598,8 +600,6 @@ export const getAllSurveys = createAsyncThunk(
   }
 );
 
-
-
 export const getAllTrainees = createAsyncThunk(
   "app/getAllTrainees",
   async ({ page = 1 } = {}, { rejectWithValue }) => {
@@ -617,6 +617,37 @@ export const getAllTrainees = createAsyncThunk(
   }
 );
 
+export const getMyCertificates = createAsyncThunk(
+  "appData/getMyCertificates",
+  async (_, { rejectWithValue }) => {
+    try {
+      const url = `${process.env.NEXT_PUBLIC_MY_CERTS_URL}`;
+
+      const res = await AxiosGetService(url);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to fetch certificates"
+      );
+    }
+  }
+);
+
+export const getAllCertificates = createAsyncThunk(
+  "app/getAllCertificates",
+  async ({ page = 1 } = {}, { rejectWithValue }) => {
+    try {
+      const url = `${process.env.NEXT_PUBLIC_ADMIN_ADMIN_CERTS_URL}?page=${page}`;
+      const res = await AxiosGetService(url);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.detail || "Failed to load certificates"
+      );
+    }
+  }
+);
+
 const appSlice = createSlice({
   name: "app",
   initialState,
@@ -625,12 +656,12 @@ const appSlice = createSlice({
       state.isDataHub = action.payload;
     },
     resetBaselineSurveyState: (state) => {
-    state.baselineSurveyState = {
-      loading: false,
-      data: null,
-      error: null,
-    };
-  },
+      state.baselineSurveyState = {
+        loading: false,
+        data: null,
+        error: null,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -845,177 +876,177 @@ const appSlice = createSlice({
         state.registerMeetingState.error = action.payload;
       });
 
-      builder
-  /* ===============================
+    builder
+      /* ===============================
      MY MEETINGS
   =============================== */
-  .addCase(getMyMeetings.pending, (state) => {
-    state.myMeetingsState.loading = true;
-    state.myMeetingsState.error = null;
-  })
-  .addCase(getMyMeetings.fulfilled, (state, action) => {
-    state.myMeetingsState.loading = false;
-    state.myMeetingsState.data = action.payload;
-  })
-  .addCase(getMyMeetings.rejected, (state, action) => {
-    state.myMeetingsState.loading = false;
-    state.myMeetingsState.error = action.payload;
-  });
+      .addCase(getMyMeetings.pending, (state) => {
+        state.myMeetingsState.loading = true;
+        state.myMeetingsState.error = null;
+      })
+      .addCase(getMyMeetings.fulfilled, (state, action) => {
+        state.myMeetingsState.loading = false;
+        state.myMeetingsState.data = action.payload;
+      })
+      .addCase(getMyMeetings.rejected, (state, action) => {
+        state.myMeetingsState.loading = false;
+        state.myMeetingsState.error = action.payload;
+      });
 
-  builder
-  // ===============================
-  // BASELINE SURVEY SUBMIT
-  // ===============================
-  .addCase(submitBaselineSurvey.pending, (state) => {
-    state.baselineSurveyState.loading = true;
-    state.baselineSurveyState.error = null;
-    state.baselineSurveyState.data = null;
-  })
-  .addCase(submitBaselineSurvey.fulfilled, (state, action) => {
-    state.baselineSurveyState.loading = false;
-    state.baselineSurveyState.data = action.payload;
-  })
-  .addCase(submitBaselineSurvey.rejected, (state, action) => {
-    state.baselineSurveyState.loading = false;
-    state.baselineSurveyState.error = action.payload;
-  });
+    builder
+      // ===============================
+      // BASELINE SURVEY SUBMIT
+      // ===============================
+      .addCase(submitBaselineSurvey.pending, (state) => {
+        state.baselineSurveyState.loading = true;
+        state.baselineSurveyState.error = null;
+        state.baselineSurveyState.data = null;
+      })
+      .addCase(submitBaselineSurvey.fulfilled, (state, action) => {
+        state.baselineSurveyState.loading = false;
+        state.baselineSurveyState.data = action.payload;
+      })
+      .addCase(submitBaselineSurvey.rejected, (state, action) => {
+        state.baselineSurveyState.loading = false;
+        state.baselineSurveyState.error = action.payload;
+      });
 
-  /* =========================================
+    /* =========================================
    GET MY BASELINE SURVEY
 ========================================= */
-builder
-  .addCase(getMyBaselineSurvey.pending, (state) => {
-    state.myBaselineSurveyState.loading = true;
-    state.myBaselineSurveyState.error = null;
-  })
-  .addCase(getMyBaselineSurvey.fulfilled, (state, action) => {
-    state.myBaselineSurveyState.loading = false;
-    state.myBaselineSurveyState.data = action.payload;
-  })
-  .addCase(getMyBaselineSurvey.rejected, (state, action) => {
-    state.myBaselineSurveyState.loading = false;
-    state.myBaselineSurveyState.error = action.payload;
-  });
+    builder
+      .addCase(getMyBaselineSurvey.pending, (state) => {
+        state.myBaselineSurveyState.loading = true;
+        state.myBaselineSurveyState.error = null;
+      })
+      .addCase(getMyBaselineSurvey.fulfilled, (state, action) => {
+        state.myBaselineSurveyState.loading = false;
+        state.myBaselineSurveyState.data = action.payload;
+      })
+      .addCase(getMyBaselineSurvey.rejected, (state, action) => {
+        state.myBaselineSurveyState.loading = false;
+        state.myBaselineSurveyState.error = action.payload;
+      });
 
-  builder
+    builder
 
-  /* ===========================
+      /* ===========================
      MY TRACK SURVEYS
   =========================== */
-  .addCase(getMyTrackSurveys.pending, (state) => {
-    state.myTrackSurveysState.loading = true;
-    state.myTrackSurveysState.error = null;
-  })
+      .addCase(getMyTrackSurveys.pending, (state) => {
+        state.myTrackSurveysState.loading = true;
+        state.myTrackSurveysState.error = null;
+      })
 
-  .addCase(getMyTrackSurveys.fulfilled, (state, action) => {
-    state.myTrackSurveysState.loading = false;
-    state.myTrackSurveysState.data = action.payload;
-  })
+      .addCase(getMyTrackSurveys.fulfilled, (state, action) => {
+        state.myTrackSurveysState.loading = false;
+        state.myTrackSurveysState.data = action.payload;
+      })
 
-  .addCase(getMyTrackSurveys.rejected, (state, action) => {
-    state.myTrackSurveysState.loading = false;
-    state.myTrackSurveysState.error = action.payload;
-  });
+      .addCase(getMyTrackSurveys.rejected, (state, action) => {
+        state.myTrackSurveysState.loading = false;
+        state.myTrackSurveysState.error = action.payload;
+      });
 
-  builder/* ===========================
+    builder /* ===========================
    SURVEY BY SLUG
 =========================== */
-.addCase(getSurveyBySlug.pending, (state) => {
-  state.surveyBySlugState.loading = true;
-  state.surveyBySlugState.error = null;
-})
+      .addCase(getSurveyBySlug.pending, (state) => {
+        state.surveyBySlugState.loading = true;
+        state.surveyBySlugState.error = null;
+      })
 
-.addCase(getSurveyBySlug.fulfilled, (state, action) => {
-  state.surveyBySlugState.loading = false;
-  state.surveyBySlugState.data = action.payload;
-})
+      .addCase(getSurveyBySlug.fulfilled, (state, action) => {
+        state.surveyBySlugState.loading = false;
+        state.surveyBySlugState.data = action.payload;
+      })
 
-.addCase(getSurveyBySlug.rejected, (state, action) => {
-  state.surveyBySlugState.loading = false;
-  state.surveyBySlugState.error = action.payload;
-});
+      .addCase(getSurveyBySlug.rejected, (state, action) => {
+        state.surveyBySlugState.loading = false;
+        state.surveyBySlugState.error = action.payload;
+      });
 
-builder
-.addCase(submitSurveyResponses.pending, (state) => {
-  state.submitSurveyState.loading = true;
-  state.submitSurveyState.error = null;
-  state.submitSurveyState.success = false;
-})
+    builder
+      .addCase(submitSurveyResponses.pending, (state) => {
+        state.submitSurveyState.loading = true;
+        state.submitSurveyState.error = null;
+        state.submitSurveyState.success = false;
+      })
 
-.addCase(submitSurveyResponses.fulfilled, (state) => {
-  state.submitSurveyState.loading = false;
-  state.submitSurveyState.success = true;
-})
+      .addCase(submitSurveyResponses.fulfilled, (state) => {
+        state.submitSurveyState.loading = false;
+        state.submitSurveyState.success = true;
+      })
 
-.addCase(submitSurveyResponses.rejected, (state, action) => {
-  state.submitSurveyState.loading = false;
-  state.submitSurveyState.error = action.payload;
-});
+      .addCase(submitSurveyResponses.rejected, (state, action) => {
+        state.submitSurveyState.loading = false;
+        state.submitSurveyState.error = action.payload;
+      });
 
-builder
-  // ===============================
-  // GET MY SURVEY RESPONSES
-  // ===============================
-  .addCase(getMySurveyResponses.pending, (state) => {
-    state.mySurveyResponsesState.loading = true;
-    state.mySurveyResponsesState.error = null;
-  })
-  .addCase(getMySurveyResponses.fulfilled, (state, action) => {
-    state.mySurveyResponsesState.loading = false;
-    state.mySurveyResponsesState.data = action.payload;
-  })
-  .addCase(getMySurveyResponses.rejected, (state, action) => {
-    state.mySurveyResponsesState.loading = false;
-    state.mySurveyResponsesState.error = action.payload;
-  });
-  builder
-  /* ================= ADMIN SURVEY RESPONSES ================= */
-.addCase(getAdminSurveyResponses.pending, (state) => {
-  state.myAdminSurveyResponsesState.loading = true;
-  state.myAdminSurveyResponsesState.error = null;
-})
-.addCase(getAdminSurveyResponses.fulfilled, (state, action) => {
-  state.myAdminSurveyResponsesState.loading = false;
-  state.myAdminSurveyResponsesState.data = action.payload.results || [];
-  state.myAdminSurveyResponsesState.count = action.payload.count;
-  state.myAdminSurveyResponsesState.next = action.payload.next;
-  state.myAdminSurveyResponsesState.previous = action.payload.previous;
-})
-.addCase(getAdminSurveyResponses.rejected, (state, action) => {
-  state.myAdminSurveyResponsesState.loading = false;
-  state.myAdminSurveyResponsesState.error = action.payload;
-});
+    builder
+      // ===============================
+      // GET MY SURVEY RESPONSES
+      // ===============================
+      .addCase(getMySurveyResponses.pending, (state) => {
+        state.mySurveyResponsesState.loading = true;
+        state.mySurveyResponsesState.error = null;
+      })
+      .addCase(getMySurveyResponses.fulfilled, (state, action) => {
+        state.mySurveyResponsesState.loading = false;
+        state.mySurveyResponsesState.data = action.payload;
+      })
+      .addCase(getMySurveyResponses.rejected, (state, action) => {
+        state.mySurveyResponsesState.loading = false;
+        state.mySurveyResponsesState.error = action.payload;
+      });
+    builder
+      /* ================= ADMIN SURVEY RESPONSES ================= */
+      .addCase(getAdminSurveyResponses.pending, (state) => {
+        state.myAdminSurveyResponsesState.loading = true;
+        state.myAdminSurveyResponsesState.error = null;
+      })
+      .addCase(getAdminSurveyResponses.fulfilled, (state, action) => {
+        state.myAdminSurveyResponsesState.loading = false;
+        state.myAdminSurveyResponsesState.data = action.payload.results || [];
+        state.myAdminSurveyResponsesState.count = action.payload.count;
+        state.myAdminSurveyResponsesState.next = action.payload.next;
+        state.myAdminSurveyResponsesState.previous = action.payload.previous;
+      })
+      .addCase(getAdminSurveyResponses.rejected, (state, action) => {
+        state.myAdminSurveyResponsesState.loading = false;
+        state.myAdminSurveyResponsesState.error = action.payload;
+      });
 
-builder
-  .addCase(getSurveyInsights.pending, (state) => {
-    state.surveyInsightsState.loading = true;
-    state.surveyInsightsState.error = null;
-  })
-  .addCase(getSurveyInsights.fulfilled, (state, action) => {
-    state.surveyInsightsState.loading = false;
-    state.surveyInsightsState.data = action.payload;
-  })
-  .addCase(getSurveyInsights.rejected, (state, action) => {
-    state.surveyInsightsState.loading = false;
-    state.surveyInsightsState.error = action.payload;
-  });
-  builder
+    builder
+      .addCase(getSurveyInsights.pending, (state) => {
+        state.surveyInsightsState.loading = true;
+        state.surveyInsightsState.error = null;
+      })
+      .addCase(getSurveyInsights.fulfilled, (state, action) => {
+        state.surveyInsightsState.loading = false;
+        state.surveyInsightsState.data = action.payload;
+      })
+      .addCase(getSurveyInsights.rejected, (state, action) => {
+        state.surveyInsightsState.loading = false;
+        state.surveyInsightsState.error = action.payload;
+      });
+    builder
 
-    /* ===============================
+      /* ===============================
        GET ALL SURVEYS
     =============================== */
-    .addCase(getAllSurveys.pending, (state) => {
-      state.allSurveysState.loading = true;
-      state.allSurveysState.error = null;
-    })
-    .addCase(getAllSurveys.fulfilled, (state, action) => {
-      state.allSurveysState.loading = false;
-      state.allSurveysState.data = action.payload;
-    })
-    .addCase(getAllSurveys.rejected, (state, action) => {
-      state.allSurveysState.loading = false;
-      state.allSurveysState.error = action.payload;
-    });
+      .addCase(getAllSurveys.pending, (state) => {
+        state.allSurveysState.loading = true;
+        state.allSurveysState.error = null;
+      })
+      .addCase(getAllSurveys.fulfilled, (state, action) => {
+        state.allSurveysState.loading = false;
+        state.allSurveysState.data = action.payload;
+      })
+      .addCase(getAllSurveys.rejected, (state, action) => {
+        state.allSurveysState.loading = false;
+        state.allSurveysState.error = action.payload;
+      });
 
     builder
       // ================= TRAINEES =================
@@ -1031,9 +1062,41 @@ builder
         state.traineesState.loading = false;
         state.traineesState.error = action.payload;
       });
-  
+    builder
+      /* ===========================
+         MY CERTIFICATES
+      =========================== */
+      .addCase(getMyCertificates.pending, (state) => {
+        state.certificatesState.loading = true;
+        state.certificatesState.error = null;
+      })
+      .addCase(getMyCertificates.fulfilled, (state, action) => {
+        state.certificatesState.loading = false;
+        state.certificatesState.data = action.payload;
+      })
+      .addCase(getMyCertificates.rejected, (state, action) => {
+        state.certificatesState.loading = false;
+        state.certificatesState.error = action.payload;
+      });
+    builder
+      .addCase(getAllCertificates.pending, (state) => {
+        state.adminCertificatesState.loading = true;
+        state.adminCertificatesState.error = null;
+      })
+      .addCase(getAllCertificates.fulfilled, (state, action) => {
+        state.adminCertificatesState.loading = false;
+        state.adminCertificatesState.data = action.payload.results;
+        state.adminCertificatesState.pagination.count = action.payload.count;
+        state.adminCertificatesState.pagination.next = action.payload.next;
+        state.adminCertificatesState.pagination.previous =
+          action.payload.previous;
+      })
+      .addCase(getAllCertificates.rejected, (state, action) => {
+        state.adminCertificatesState.loading = false;
+        state.adminCertificatesState.error = action.payload;
+      });
   },
 });
 
-export const { ToggleIsDataHub,resetBaselineSurveyState } = appSlice.actions;
+export const { ToggleIsDataHub, resetBaselineSurveyState } = appSlice.actions;
 export default appSlice.reducer;
